@@ -12,6 +12,9 @@ int main() {
 	sf::Text t("Hello SFML", f);
 	sf::RenderWindow w(sf::VideoMode(400, 200), "Hello");
 
+	float x = 0.01;
+	float y = 0.0;
+
 	while (w.isOpen()) {
 		sf::Event evt;
 		if (w.pollEvent(evt)) {
@@ -20,11 +23,15 @@ int main() {
 				w.close();
 			}
 		}
-		
+
 		w.clear();
 		w.draw(t);
-		t.move(0.01, 0);
 		w.display();
+		if (t.getPosition().x > 400) {
+			x = 0.01;
+			t.setPosition(0, 0);
+		}
+		t.move(x, y);
 	}
 
 	return EXIT_SUCCESS;
