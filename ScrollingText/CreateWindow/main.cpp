@@ -1,6 +1,7 @@
 #include <sfml/Window.hpp>
 #include <sfml/Graphics.hpp>
 #include <iostream>
+#include <sfml/System.hpp>
 
 int main() {
 	
@@ -20,7 +21,9 @@ int main() {
 			}
 		}
 		
+		w.clear();
 		w.draw(t);
+		t.move(0.01, 0);
 		w.display();
 	}
 
