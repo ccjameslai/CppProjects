@@ -1,3 +1,2 @@
 ﻿  main.cpp
-D:\CppProjects\ScrollingText\CreateWindow\main.cpp(32,12): warning C4305: '=': 從 'double' 轉換為 'float'，是由較大的類型轉換為較小的類型，可能導致資料遺失
   CreateWindow.vcxproj -> D:\CppProjects\ScrollingText\Debug\CreateWindow.exe

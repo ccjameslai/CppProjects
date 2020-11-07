@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sfml/System.hpp>
 
+using namespace std;
+
 int main() {
 	
 	sf::Font f;
@@ -10,10 +12,15 @@ int main() {
 		return EXIT_FAILURE;
 	}
 	sf::Text t("Hello SFML", f);
+	t.setStyle(sf::Text::Bold | sf::Text::Italic);
+	t.setFillColor(sf::Color::Cyan);
+
+	size_t wordIndex = 100;
 	sf::RenderWindow w(sf::VideoMode(400, 200), "Hello");
 
-	float x = 0.01;
-	float y = 0.0;
+	float pos = t.findCharacterPos(wordIndex).x;
+	float x = 0.05f;
+	float y = 0.f;
 
 	while (w.isOpen()) {
 		sf::Event evt;
@@ -26,13 +33,16 @@ int main() {
 
 		w.clear();
 		w.draw(t);
-		w.display();
+		
+
 		if (t.getPosition().x > 400) {
-			x = 0.01;
-			t.setPosition(0, 0);
+			t.setPosition(-1*pos, 0);
 		}
+
+		w.display();
+	
 		t.move(x, y);
 	}
-
+	
 	return EXIT_SUCCESS;
 }
