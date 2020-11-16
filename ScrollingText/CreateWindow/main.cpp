@@ -13,6 +13,8 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
+	sf::RenderWindow w(sf::VideoMode(400, 200), "Hello");
+
 	size_t wordIndex = 100;
 
 	sf::Text t("Hello SFML", f);
@@ -20,19 +22,22 @@ int main() {
 	
 	float pos = t.findCharacterPos(wordIndex).x;
 
-	//t.setStyle(sf::Text::Bold | sf::Text::Italic);
+	t.setStyle(sf::Text::Bold | sf::Text::Italic);
 	t.setFillColor(sf::Color::White);
 
-	t1.setPosition(-1 * pos, 0);
-	//t1.setStyle(sf::Text::Bold | sf::Text::Italic);
+	t1.setPosition(-1 * float(w.getSize().x), 0);
+	t1.setStyle(sf::Text::Bold | sf::Text::Italic);
 	t1.setFillColor(sf::Color::Green);
 
-	sf::RenderWindow w(sf::VideoMode(400, 200), "Hello");
-	
+	enum class Speed {FAST, SLOW};
+	enum class Direction {LEFT2RIGHT, RIGHT2LEFT};
+
+	Speed speed = Speed::FAST;
+	Direction direction = Direction::RIGHT2LEFT;
+
 	float x = 0.03f;
 	float y = 0.f;
 
-	bool isFirstRun = true;
 	vector<sf::Color> cv = { sf::Color::Blue, sf::Color::Cyan, sf::Color::Green, sf::Color::Magenta,
 							sf::Color::White, sf::Color::Yellow, sf::Color::Red };
 
@@ -46,6 +51,17 @@ int main() {
 				std::cout << "close" << std::endl;
 				w.close();
 			}
+
+			if (evt.type == sf::Event::KeyPressed) {
+				switch (direction) {
+				case Direction::LEFT2RIGHT:
+					direction = Direction::RIGHT2LEFT;
+					break;
+				case Direction::RIGHT2LEFT:
+					direction = Direction::LEFT2RIGHT;
+					break;
+				}
+			}
 		}
 
 		w.clear();
@@ -54,31 +70,30 @@ int main() {
 
 		w.display();
 
-		if (t.getPosition().x < (400 - pos) && t1.getPosition().x < 0) {
-			t.move(x, y);
-		}
-		else if (t.getPosition().x >= (400 - pos) && t.getPosition().x <= (800 - pos)) {
-			t1.move(x, y);
-			t.move(x, y);
-		}
-		else if (t.getPosition().x > (800 - pos)) {
-			t1.move(x, y);
-			t.setPosition(-1 * pos, 0);
-			t.setFillColor(cv[rand() % (max - min + 1) + min]);
-		}
+		if (direction == Direction::RIGHT2LEFT) {
+			if (t.getPosition().x > w.getSize().x) {
+				t.setPosition(-1 * float(w.getSize().x), 0);
+			}
 
-		if (t1.getPosition().x < (400 - pos) && t.getPosition().x < 0) {
+			if (t1.getPosition().x > w.getSize().x) {
+				t1.setPosition(-1 * float(w.getSize().x), 0);
+			}
+
+			t.move(x, y);
 			t1.move(x, y);
 		}
-		else if (t1.getPosition().x >= (400 - pos) && t1.getPosition().x <= (800 - pos)) {
-			t1.move(x, y);
-			t.move(x, y);
-		}
-		else if (t1.getPosition().x > (800 - pos)) {
-			t.move(x, y);
-			t1.setPosition(-1 * pos, 0);
-			t.setFillColor(cv[rand() % (max - min + 1) + min]);
-		}
+		else {
+			if (t.getPosition().x < -float(w.getSize().x)) {
+				t.setPosition(float(w.getSize().x), 0);
+			}
+
+			if (t1.getPosition().x < -float(w.getSize().x)) {
+				t1.setPosition(float(w.getSize().x), 0);
+			}
+
+			t.move(-x, -y);
+			t1.move(-x, -y);
+		}	
 	}
 	
 	return EXIT_SUCCESS;
