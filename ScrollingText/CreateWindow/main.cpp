@@ -29,17 +29,11 @@ int main() {
 	t1.setStyle(sf::Text::Bold | sf::Text::Italic);
 	t1.setFillColor(sf::Color::Green);
 
-	enum class Speed {FAST, SLOW};
 	enum class Direction {LEFT2RIGHT, RIGHT2LEFT};
 
-	//Speed speed = Speed::FAST;
-	Direction direction = Direction::RIGHT2LEFT;
-
-	vector<sf::Color> cv = { sf::Color::Blue, sf::Color::Cyan, sf::Color::Green, sf::Color::Magenta,
-							sf::Color::White, sf::Color::Yellow, sf::Color::Red };
+	Direction direction = Direction::RIGHT2LEFT;	
 
 	float speed = 0.1f;
-	float acc = 2.f;
 
 	while (w.isOpen()) {
 		sf::Event evt;
@@ -57,12 +51,29 @@ int main() {
 				direction = Direction::LEFT2RIGHT;
 			}
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1) || 
+				sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1)) {
+				speed = 0.4f;
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2) ||
+				sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad2)) {
 				speed = 0.2f;
 			}
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-				speed = 0.02f;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3) ||
+				sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad3)) {
+				speed = 0.1f;
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4) ||
+				sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad4)) {
+				speed = 0.05f;
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5) ||
+				sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad5)) {
+				speed = 0.025f;
 			}
 			cout << speed << endl;
 		}
