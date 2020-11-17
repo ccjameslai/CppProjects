@@ -32,17 +32,14 @@ int main() {
 	enum class Speed {FAST, SLOW};
 	enum class Direction {LEFT2RIGHT, RIGHT2LEFT};
 
-	Speed speed = Speed::FAST;
+	//Speed speed = Speed::FAST;
 	Direction direction = Direction::RIGHT2LEFT;
-
-	float x = 0.03f;
-	float y = 0.f;
 
 	vector<sf::Color> cv = { sf::Color::Blue, sf::Color::Cyan, sf::Color::Green, sf::Color::Magenta,
 							sf::Color::White, sf::Color::Yellow, sf::Color::Red };
 
-	int min = 0;
-	int max = cv.size();
+	float speed = 0.1f;
+	float acc = 2.f;
 
 	while (w.isOpen()) {
 		sf::Event evt;
@@ -50,18 +47,24 @@ int main() {
 			if (evt.type == sf::Event::Closed) {
 				std::cout << "close" << std::endl;
 				w.close();
+			}			
+			
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+				direction = Direction::RIGHT2LEFT;
 			}
 
-			if (evt.type == sf::Event::KeyPressed) {
-				switch (direction) {
-				case Direction::LEFT2RIGHT:
-					direction = Direction::RIGHT2LEFT;
-					break;
-				case Direction::RIGHT2LEFT:
-					direction = Direction::LEFT2RIGHT;
-					break;
-				}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+				direction = Direction::LEFT2RIGHT;
 			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+				speed = 0.2f;
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+				speed = 0.02f;
+			}
+			cout << speed << endl;
 		}
 
 		w.clear();
@@ -79,8 +82,8 @@ int main() {
 				t1.setPosition(-1 * float(w.getSize().x), 0);
 			}
 
-			t.move(x, y);
-			t1.move(x, y);
+			t.move(speed, 0);
+			t1.move(speed, 0);
 		}
 		else {
 			if (t.getPosition().x < -float(w.getSize().x)) {
@@ -91,8 +94,8 @@ int main() {
 				t1.setPosition(float(w.getSize().x), 0);
 			}
 
-			t.move(-x, -y);
-			t1.move(-x, -y);
+			t.move(-speed, 0);
+			t1.move(-speed, 0);
 		}	
 	}
 	
