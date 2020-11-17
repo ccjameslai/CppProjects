@@ -34,6 +34,7 @@ int main() {
 	Direction direction = Direction::RIGHT2LEFT;	
 
 	float speed = 0.1f;
+	float times = 2.f;
 
 	while (w.isOpen()) {
 		sf::Event evt;
@@ -71,10 +72,20 @@ int main() {
 				speed = 0.05f;
 			}
 
+
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5) ||
 				sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad5)) {
 				speed = 0.025f;
 			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add)) {
+				speed *= times;
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract)) {
+				speed /= times;
+			}
+
 			cout << speed << endl;
 		}
 
