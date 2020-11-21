@@ -21,6 +21,17 @@ public:
 		head_ = temp.next;
  	}
 
+	ForwardList<T>& operator=(ForwardList<T>& other) {
+		if (head_ == other.head_) {
+			return *this;
+		}
+
+		ForwardList<T> newList = other;
+		swap(head_, newList.head_);
+		
+		return *this;
+	}
+
 	~ForwardList()
 	{
 		while (!Isempty()) {
@@ -58,7 +69,9 @@ int main() {
 	l.PushFront(30);
 	l.Print();
 	
-	ForwardList<int> a = l;
+	// ForwardList<int> a = l; // copy constructor
+	ForwardList<int> a;
+	a = l; // copy assignment perator
 	a.Print();
 
 	return EXIT_SUCCESS;
