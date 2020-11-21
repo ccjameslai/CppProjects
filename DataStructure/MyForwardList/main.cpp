@@ -8,6 +8,35 @@ public:
 	ForwardList() : head_(nullptr) {};
 	void Print();
 	void PushFront(const T&);
+	
+	ForwardList(const ForwardList& other) {
+		ListNode_ temp(T{});
+		ListNode_* head = &temp;
+		
+		for (ListNode_* curr = other.head_; curr != nullptr; curr = curr->next) {
+			head->next = new ListNode_(curr->val);
+			head = head->next;
+		}
+
+		head_ = temp.next;
+ 	}
+
+	~ForwardList()
+	{
+		while (!Isempty()) {
+			PopFront();
+		}
+	}
+	void PopFront() {
+		ListNode_* temp = head_;
+		head_ = head_->next;
+		
+		delete temp;
+	}
+
+	bool Isempty() {
+		return head_ == nullptr;
+	}
 
 private:
 	struct ListNode_ {
@@ -28,6 +57,9 @@ int main() {
 	l.Print();
 	l.PushFront(30);
 	l.Print();
+	
+	ForwardList<int> a = l;
+	a.Print();
 
 	return EXIT_SUCCESS;
 }
