@@ -7,6 +7,7 @@ class ForwardList {
 public:
 	ForwardList() : head_(nullptr) {};
 	void Print();
+	void PushFront(const T&);
 
 private:
 	struct ListNode_ {
@@ -20,6 +21,12 @@ private:
 
 int main() { 
 	ForwardList<int> l;
+	l.Print();
+	l.PushFront(10);
+	l.Print();
+	l.PushFront(20);
+	l.Print();
+	l.PushFront(30);
 	l.Print();
 
 	return EXIT_SUCCESS;
@@ -35,4 +42,12 @@ void ForwardList<T>::Print() {
 		}
 	}
 	cout << "]" << endl;
+}
+
+template<typename T>
+void ForwardList<T>::PushFront(const T& val) {
+	ListNode_* temp = head_;
+	head_ = new ListNode_(val);
+
+	head_->next = temp;
 }
