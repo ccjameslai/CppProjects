@@ -19,7 +19,7 @@ int main() {
 	size_t wordIndex = 100;
 	string text;
 	
-	ifstream ifs("content.txt", ifstream::in);
+	ifstream ifs("input.txt", ifstream::in);
 	getline(ifs, text);
 
 	sf::Text t(text, f, 150);

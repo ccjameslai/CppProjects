@@ -23,7 +23,7 @@
     <CopyFileToFolders Include="BROADW.TTF">
       <Filter>資源檔</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="content.txt">
+    <CopyFileToFolders Include="input.txt">
       <Filter>資源檔</Filter>
     </CopyFileToFolders>
   </ItemGroup>
