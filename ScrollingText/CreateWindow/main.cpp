@@ -94,7 +94,8 @@ int main() {
 				speedMode = SpeedMode::FREE;
 			}
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add)) {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add) || 
+				(sf::Keyboard::isKeyPressed(sf::Keyboard::Equal) && evt.key.shift)) {
 				if (speed > 50.f) {
 					speed = 50.f;
 				}
@@ -104,7 +105,8 @@ int main() {
 				speedMode = SpeedMode::FREE;
 			}
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract)) {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract) || 
+				(sf::Keyboard::isKeyPressed(sf::Keyboard::Hyphen) && evt.key.shift)) {
 				if (speed < 0.0125f) {
 					speed = 0.0125f;
 				}
