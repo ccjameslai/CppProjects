@@ -51,7 +51,11 @@ int main() {
 
 		w.clear();
 
-		if (clock.getElapsedTime().asSeconds() > 1.f) {
+		if (clock.getElapsedTime().asSeconds() > 0.4f) {
+			if (head == food) {
+				std::cout << "Eaten" << std::endl;
+			}
+
 			if (direction == DIRECTION::RIGHT) {
 				head.x++;
 			}
