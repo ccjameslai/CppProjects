@@ -16,8 +16,8 @@ int main() {
 	sf::VideoMode mode(blockSize.x * fieldSize.x, blockSize.y * fieldSize.y);
 	sf::RenderWindow w(mode, L"³g¦Y³D");
 	
-	
-
+	//w.setFramerateLimit(1);
+	sf::Clock clock;
 	while (w.isOpen()) {
 		sf::Event evt;
 		if (w.pollEvent(evt)) {
@@ -26,7 +26,13 @@ int main() {
 			}
 		}
 
-		block.setPosition(head.x * fieldSize.x, head.y * fieldSize.y);
+		w.clear();
+		if (clock.getElapsedTime().asSeconds() > 1.f) {
+			head.x++;
+			clock.restart();
+		}
+		
+		block.setPosition(head.x * blockSize.x, head.y * blockSize.y);
 		w.draw(block);
 
 		/*for (int i = 0; i < fieldSize.x; i++) {
