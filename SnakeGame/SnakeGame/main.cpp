@@ -7,41 +7,72 @@ int main() {
 		std::cout << "Texture not found!!" << std::endl;
 	}
 	
-	sf::Sprite block(texture);
-	sf::Vector2<float> blockSize(block.getGlobalBounds().width, block.getGlobalBounds().height);
+	sf::Sprite snake(texture);
+	sf::Sprite foodPos(texture);
+	sf::Vector2<float> blockSize(snake.getGlobalBounds().width, snake.getGlobalBounds().height);
 
 	sf::Vector2<int> fieldSize(20, 15);
 	sf::Vector2f head(3, 4);
+	sf::Vector2f food(rand()%fieldSize.x, rand()%fieldSize.y);
 
-	sf::VideoMode mode(blockSize.x * fieldSize.x, blockSize.y * fieldSize.y);
+	sf::VideoMode mode(
+		unsigned int (blockSize.x * fieldSize.x),
+		unsigned int(blockSize.y * fieldSize.y));
+
 	sf::RenderWindow w(mode, L"³g¦Y³D");
 	
-	//w.setFramerateLimit(1);
+	enum class DIRECTION {UP, DOWN, LEFT, RIGHT};
+	DIRECTION direction = DIRECTION::RIGHT;
+
 	sf::Clock clock;
+
 	while (w.isOpen()) {
 		sf::Event evt;
 		if (w.pollEvent(evt)) {
 			if (evt.type == sf::Event::Closed) {
 				w.close();
 			}
+
+			if (evt.type == sf::Event::KeyPressed) {
+				if (evt.key.code == sf::Keyboard::Up) {
+					direction = DIRECTION::UP;
+				}
+				if (evt.key.code == sf::Keyboard::Down) {
+					direction = DIRECTION::DOWN;
+				}
+				if (evt.key.code == sf::Keyboard::Left) {
+					direction = DIRECTION::LEFT;
+				}
+				if (evt.key.code == sf::Keyboard::Right) {
+					direction = DIRECTION::RIGHT;
+				}
+			}
 		}
 
 		w.clear();
+
 		if (clock.getElapsedTime().asSeconds() > 1.f) {
-			head.x++;
+			if (direction == DIRECTION::RIGHT) {
+				head.x++;
+			}
+			if (direction == DIRECTION::LEFT) {
+				head.x--;
+			}
+			if (direction == DIRECTION::DOWN) {
+				head.y++;
+			}
+			if (direction == DIRECTION::UP) {
+				head.y--;
+			}
+			
 			clock.restart();
 		}
 		
-		block.setPosition(head.x * blockSize.x, head.y * blockSize.y);
-		w.draw(block);
+		snake.setPosition(head.x * blockSize.x, head.y * blockSize.y);
+		foodPos.setPosition(food.x * blockSize.x, food.y * blockSize.y);
 
-		/*for (int i = 0; i < fieldSize.x; i++) {
-			for (int j = 0; j < fieldSize.y; j++) {
-				sf::Vector2<float> pos(i * blockSize.x, j * blockSize.y);
-				block.setPosition(pos);
-				w.draw(block);
-			}
-		}*/
+		w.draw(snake);
+		w.draw(foodPos);
 
 		w.display();
 		
