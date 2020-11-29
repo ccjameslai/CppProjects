@@ -14,5 +14,5 @@ int main() {
 
 		w.display();
 	}
-	return EXIT_SUCCESS
+	return EXIT_SUCCESS;
 }
