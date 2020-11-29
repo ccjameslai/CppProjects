@@ -26,3 +26,7 @@
 /SnakeGame/SnakeGame/SnakeGame.vcxproj.filters
 /SnakeGame/SnakeGame/SnakeGame.vcxproj.user
 /SnakeGame/SnakeGame.sln
+/SnakeGame/Debug
+*.CopyComplete
+*.txt
+*.obj

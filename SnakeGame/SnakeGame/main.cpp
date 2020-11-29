@@ -3,6 +3,9 @@
 int main() {
 	sf::VideoMode mode(400, 300);
 	sf::RenderWindow w(mode, L"³g¦Y³D");
+	sf::Texture texture;
+	texture.loadFromFile("block.png");
+	sf::Sprite image(texture);
 
 	while (w.isOpen()) {
 		sf::Event evt;
@@ -12,7 +15,9 @@ int main() {
 			}
 		}
 
+		w.draw(image);
 		w.display();
+		
 	}
 	return EXIT_SUCCESS;
 }
