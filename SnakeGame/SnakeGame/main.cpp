@@ -8,12 +8,15 @@ int main() {
 	}
 	
 	sf::Sprite snake(texture);
-	sf::Sprite foodPos(texture);
-	sf::Vector2<float> blockSize(snake.getGlobalBounds().width, snake.getGlobalBounds().height);
+	sf::Sprite food = snake;
 
+	sf::Vector2<float> blockSize(snake.getGlobalBounds().width, snake.getGlobalBounds().height);
 	sf::Vector2<int> fieldSize(20, 15);
-	sf::Vector2f head(3, 4);
-	sf::Vector2f food(rand()%fieldSize.x, rand()%fieldSize.y);
+
+	sf::Vector2f headPos(3, 4);
+
+	srand(time(NULL));
+	sf::Vector2f foodPos(rand()%fieldSize.x, rand()%fieldSize.y);
 
 	sf::VideoMode mode(
 		unsigned int (blockSize.x * fieldSize.x),
@@ -52,31 +55,31 @@ int main() {
 		w.clear();
 
 		if (clock.getElapsedTime().asSeconds() > 0.4f) {
-			if (head == food) {
+			if (headPos == foodPos) {
 				std::cout << "Eaten" << std::endl;
 			}
 
 			if (direction == DIRECTION::RIGHT) {
-				head.x++;
+				headPos.x++;
 			}
 			if (direction == DIRECTION::LEFT) {
-				head.x--;
+				headPos.x--;
 			}
 			if (direction == DIRECTION::DOWN) {
-				head.y++;
+				headPos.y++;
 			}
 			if (direction == DIRECTION::UP) {
-				head.y--;
+				headPos.y--;
 			}
 			
 			clock.restart();
 		}
 		
-		snake.setPosition(head.x * blockSize.x, head.y * blockSize.y);
-		foodPos.setPosition(food.x * blockSize.x, food.y * blockSize.y);
+		snake.setPosition(headPos.x * blockSize.x, headPos.y * blockSize.y);
+		food.setPosition(foodPos.x * blockSize.x, foodPos.y * blockSize.y);
 
 		w.draw(snake);
-		w.draw(foodPos);
+		w.draw(food);
 
 		w.display();
 		
