@@ -1,22 +1,27 @@
 #include <sfml/Graphics.hpp>
 #include <iostream>
+#include <vector>
 
 int main() {
 	sf::Texture texture;
-	if (!texture.loadFromFile("block.png")) {
-		std::cout << "Texture not found!!" << std::endl;
-	}
 	
-	sf::Sprite snake(texture);
-	sf::Sprite food = snake;
-
-	sf::Vector2<float> blockSize(snake.getGlobalBounds().width, snake.getGlobalBounds().height);
 	sf::Vector2<int> fieldSize(20, 15);
 
-	sf::Vector2f headPos(3, 4);
+	if (!texture.loadFromFile("block.png")) {
+		std::cout << "Texture not found!!" << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	sf::Sprite block(texture);
+
+	sf::Vector2<float> blockSize(
+		block.getGlobalBounds().width, 
+		block.getGlobalBounds().height);
+
+	sf::Vector2i food(rand()% fieldSize.x, rand() % fieldSize.y);
+	std::vector<sf::Vector2i> snake = { sf::Vector2i(3, 4) };
 
 	srand(time(NULL));
-	sf::Vector2f foodPos(rand()%fieldSize.x, rand()%fieldSize.y);
 
 	sf::VideoMode mode(
 		unsigned int (blockSize.x * fieldSize.x),
@@ -28,6 +33,7 @@ int main() {
 	DIRECTION direction = DIRECTION::RIGHT;
 
 	sf::Clock clock;
+	bool isDead = false;
 
 	while (w.isOpen()) {
 		sf::Event evt;
@@ -52,34 +58,58 @@ int main() {
 			}
 		}
 
-		w.clear();
-
-		if (clock.getElapsedTime().asSeconds() > 0.4f) {
-			if (headPos == foodPos) {
-				std::cout << "Eaten" << std::endl;
-			}
+		if (clock.getElapsedTime().asSeconds() >= 0.4f) {
+			sf::Vector2i head = snake[0];
 
 			if (direction == DIRECTION::RIGHT) {
-				headPos.x++;
+				head.x++;
 			}
 			if (direction == DIRECTION::LEFT) {
-				headPos.x--;
+				head.x--;
 			}
 			if (direction == DIRECTION::DOWN) {
-				headPos.y++;
+				head.y++;
 			}
 			if (direction == DIRECTION::UP) {
-				headPos.y--;
+				head.y--;
+			}
+
+			if (head.x < 0 || head.x > fieldSize.x ||
+				head.y < 0 || head.y > fieldSize.y) {
+				isDead = true;
 			}
 			
+			snake.insert(snake.begin(), head);
+
+			if (!isDead) {
+				if (head == food) {
+					std::cout << "Eaten" << std::endl;
+				}
+				else {
+					snake.pop_back();
+				}
+			}
+
 			clock.restart();
 		}
-		
-		snake.setPosition(headPos.x * blockSize.x, headPos.y * blockSize.y);
-		food.setPosition(foodPos.x * blockSize.x, foodPos.y * blockSize.y);
 
-		w.draw(snake);
-		w.draw(food);
+		if (isDead) {
+			w.clear(sf::Color(255, 0, 0));
+		}
+		else {
+			w.clear();
+		}
+		
+		
+		for (auto body : snake) {
+			sf::Vector2f blockPos(body.x * blockSize.x, body.y * blockSize.y);
+			block.setPosition(blockPos);
+			w.draw(block);
+		}
+		
+		sf::Vector2f foodPos(food.x * blockSize.x, food.y * blockSize.y);
+		block.setPosition(foodPos);
+		w.draw(block);
 
 		w.display();
 		
