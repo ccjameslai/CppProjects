@@ -1,6 +1,8 @@
 #include <sfml/Graphics.hpp>
+#include <sfml/Window.hpp>
 #include <iostream>
 #include <vector>
+#include <string>
 
 int main() {
 	sf::Texture texture;
@@ -12,6 +14,15 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
+	sf::Font font;
+	if (!font.loadFromFile("BROADW.TTF")) {
+		return EXIT_FAILURE;
+	}
+
+	sf::Text t("score:", font);
+	sf::Text s("0", font);
+	s.setPosition(t.getLocalBounds().width + 5, 0);
+
 	sf::Sprite block(texture);
 
 	sf::Vector2<float> blockSize(
@@ -21,7 +32,7 @@ int main() {
 	sf::Vector2i food(rand()% fieldSize.x, rand() % fieldSize.y);
 	std::vector<sf::Vector2i> snake = { sf::Vector2i(3, 4) };
 
-	srand(time(NULL));
+	srand(unsigned int(time(NULL)));
 
 	sf::VideoMode mode(
 		unsigned int (blockSize.x * fieldSize.x),
@@ -34,6 +45,7 @@ int main() {
 
 	sf::Clock clock;
 	bool isDead = false;
+	int count = 0;
 
 	while (w.isOpen()) {
 		sf::Event evt;
@@ -84,6 +96,12 @@ int main() {
 			if (!isDead) {
 				if (head == food) {
 					std::cout << "Eaten" << std::endl;
+
+					count++;
+					s.setString(std::to_string(count));
+					
+					food.x = rand() % fieldSize.x;
+					food.y = rand() % fieldSize.y;
 				}
 				else {
 					snake.pop_back();
@@ -100,6 +118,8 @@ int main() {
 			w.clear();
 		}
 		
+		w.draw(t);
+		w.draw(s);
 		
 		for (auto body : snake) {
 			sf::Vector2f blockPos(body.x * blockSize.x, body.y * blockSize.y);
