@@ -24,6 +24,8 @@ int main() {
 	s.setPosition(t.getLocalBounds().width + 5, 0);
 
 	sf::Sprite block(texture);
+	sf::Sprite foodblock(texture);
+	foodblock.setColor(sf::Color(50, 200, 50));
 
 	sf::Vector2<float> blockSize(
 		block.getGlobalBounds().width, 
@@ -96,7 +98,7 @@ int main() {
 					isDead = true;
 				}
 			}
-
+			
 			if (!isDead) {
 				snake.insert(snake.begin(), head);
 
@@ -145,8 +147,8 @@ int main() {
 		}
 		
 		sf::Vector2f foodPos(food.x * blockSize.x, food.y * blockSize.y);
-		block.setPosition(foodPos);
-		w.draw(block);
+		foodblock.setPosition(foodPos);
+		w.draw(foodblock);
 
 		w.display();
 		
