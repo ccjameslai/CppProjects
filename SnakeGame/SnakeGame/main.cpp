@@ -86,17 +86,21 @@ int main() {
 				head.y--;
 			}
 
-			if (head.x < 0 || head.x > fieldSize.x ||
-				head.y < 0 || head.y > fieldSize.y) {
+			if (head.x < 0 || head.x >= fieldSize.x ||
+				head.y < 0 || head.y >= fieldSize.y) {
 				isDead = true;
 			}
-			
-			snake.insert(snake.begin(), head);
+
+			for (size_t i = 1; i < snake.size(); i++) {
+				if (head == snake[i]) {
+					isDead = true;
+				}
+			}
 
 			if (!isDead) {
-				if (head == food) {
-					std::cout << "Eaten" << std::endl;
+				snake.insert(snake.begin(), head);
 
+				if (head == food) {
 					count++;
 					s.setString(std::to_string(count));
 					
@@ -113,11 +117,24 @@ int main() {
 
 		if (isDead) {
 			w.clear(sf::Color(255, 0, 0));
+
+			if (evt.type == sf::Event::KeyPressed) {
+				isDead = false;
+
+				snake = { sf::Vector2i(
+					(rand() % (fieldSize.x - 2)) + 1,
+					(rand() % (fieldSize.y - 2)) + 1) };
+
+				direction = DIRECTION(rand() % 4);
+
+				count = 0;
+				s.setString(std::to_string(count));
+			}
 		}
 		else {
 			w.clear();
 		}
-		
+
 		w.draw(t);
 		w.draw(s);
 		
