@@ -31,3 +31,13 @@
 *.txt
 *.obj
 *.TTF
+*.ipch
+*.db
+*.suo
+*.dll
+*.png
+*.exe
+*.sln
+*.vcxproj
+*.user
+*.filters
