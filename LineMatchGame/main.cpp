@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 
-sf::Vector2f getPixelPosition(const sf::Vector2i& pos, const sf::Vector2i& blocksize) {
+sf::Vector2f getPixelPosition(
+	const sf::Vector2i& pos, 
+	const sf::Vector2i& blocksize) {
 	return sf::Vector2f(float(pos.x * blocksize.x), float(pos.y * blocksize.y));
 }
 
@@ -21,19 +23,19 @@ int main() {
 	sf::Sprite block(blockTexture);
 	block.setPosition(getPixelPosition(pos, blocksize));
 
-	enum Direction {
-		Left,
-		Right,
-		Down,
+	enum class Action {
+		MoveLeft,
+		MoveRight,
+		MoveDown,
 		Hold
 	};
-
-	Direction direction(Direction::Hold);
 
 	sf::Clock clock; 
 	while (w.isOpen())
 	{
 		sf::Event evt;
+		Action action = Action::Hold;
+
 		if (w.pollEvent(evt)) {
 			if (evt.type == sf::Event::Closed) {
 				w.close();
@@ -41,24 +43,41 @@ int main() {
 
 			if (evt.type == sf::Event::KeyPressed) {
 				if (evt.key.code == sf::Keyboard::Left) {
-					direction = Direction::Left;
-					pos.x--;
+					action = Action::MoveLeft;
 				}
 
 				if (evt.key.code == sf::Keyboard::Right) {
-					direction = Direction::Right;
-					pos.x++;
+					action = Action::MoveRight;
 				}
 			}		
 		}
 
 		if (clock.getElapsedTime().asSeconds() >= 0.5f) {
-			pos.y++;
-			
+			action = Action::MoveDown;
 			clock.restart();
 		}
 
 		w.clear();
+
+		sf::Vector2i nextPos(pos);
+		switch (action) {
+		case (Action::MoveDown):
+			nextPos.y++;
+			break;
+		case (Action::MoveLeft):
+			nextPos.x--;
+			break;
+		case (Action::MoveRight):
+			nextPos.x++;
+			break;
+		case (Action::Hold):
+			break;
+		}
+		
+		if (nextPos.x >= 0 && nextPos.x < fieldWidth &&
+			nextPos.y < fieldHeight) {
+			pos = nextPos;
+		}
 
 		block.setPosition(getPixelPosition(pos, blocksize));
 		
