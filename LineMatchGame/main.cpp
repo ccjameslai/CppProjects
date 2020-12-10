@@ -9,13 +9,15 @@ int main() {
 	sf::Vector2i blocksize(blockTexture.getSize());
 
 	sf::String title(L"簡易消行遊戲");
-
 	sf::VideoMode mode(fieldWidth * blocksize.x, fieldHeight * blocksize.y);
 	sf::RenderWindow w(mode , title);
 
-	sf::Sprite block(blockTexture);
-	block.setPosition(fieldWidth / 2 * blocksize.x, 0);
+	sf::Vector2f pos(0, 0);
 
+	sf::Sprite block(blockTexture);
+	block.setPosition(float(fieldWidth / 2 * blocksize.x), pos.y);
+
+	sf::Clock clock;
 	while (w.isOpen())
 	{
 		sf::Event evt;
@@ -23,6 +25,13 @@ int main() {
 			if (evt.type == sf::Event::Closed) {
 				w.close();
 			}
+		}
+
+		if (clock.getElapsedTime().asSeconds() >= 0.5f) {
+			pos.y++;
+			block.setPosition(float(fieldWidth / 2 * blocksize.x), pos.y * blocksize.y);
+
+			clock.restart();
 		}
 
 		w.clear();
