@@ -1,5 +1,7 @@
 #include <SFML/Graphics.hpp>
 
+using namespace std;
+
 sf::Vector2f getPixelPosition(
 	const sf::Vector2i& pos, 
 	const sf::Vector2i& blocksize) {
@@ -7,8 +9,10 @@ sf::Vector2f getPixelPosition(
 }
 
 int main() {
-	unsigned int fieldWidth = 9;
-	unsigned int fieldHeight = 15;
+	const int fieldWidth = 9;
+	const int fieldHeight = 15;
+
+	bool fieldState[fieldWidth][fieldHeight] = {};
 
 	sf::Texture blockTexture;
 	blockTexture.loadFromFile("block.png");
@@ -18,7 +22,8 @@ int main() {
 	sf::VideoMode mode(fieldWidth * blocksize.x, fieldHeight * blocksize.y);
 	sf::RenderWindow w(mode , title);
 
-	sf::Vector2i pos(fieldWidth / 2, 0);
+	sf::Vector2i origin(fieldWidth / 2, 0);
+	sf::Vector2i pos(origin);
 
 	sf::Sprite block(blockTexture);
 	block.setPosition(getPixelPosition(pos, blocksize));
@@ -78,10 +83,26 @@ int main() {
 			nextPos.y < fieldHeight) {
 			pos = nextPos;
 		}
+		else {
+			if (action == Action::MoveDown) {
+				fieldState[pos.x][pos.y] = true;
+				pos = origin;
+			}
+		}
 
 		block.setPosition(getPixelPosition(pos, blocksize));
-		
 		w.draw(block);
+
+		for (int x = 0; x < fieldWidth; x++) {
+			for (int y = 0; y < fieldHeight; y++) {
+				if (fieldState[x][y] == true) {
+					sf::Vector2i obstacle(x, y);
+					block.setPosition(getPixelPosition(obstacle, blocksize));
+					w.draw(block);
+				}
+			}
+		}
+
 		w.display();
 	}
 
