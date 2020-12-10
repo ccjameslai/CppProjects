@@ -1,5 +1,5 @@
 #include <SFML/Graphics.hpp>
-
+#include <iostream>
 using namespace std;
 
 sf::Vector2f getPixelPosition(
@@ -13,6 +13,12 @@ int main() {
 	const int fieldHeight = 15;
 
 	bool fieldState[fieldWidth][fieldHeight] = {};
+	for (int y = 3; y < fieldHeight; y++) {
+		for (int k = 1; k < 3; k++) {
+			fieldState[rand()%fieldWidth][y] = true;
+		}
+	}
+
 
 	sf::Texture blockTexture;
 	blockTexture.loadFromFile("block.png");
@@ -80,12 +86,38 @@ int main() {
 		}
 		
 		if (nextPos.x >= 0 && nextPos.x < fieldWidth &&
-			nextPos.y < fieldHeight) {
+			nextPos.y < fieldHeight && fieldState[nextPos.x][nextPos.y] == false) {
 			pos = nextPos;
 		}
 		else {
 			if (action == Action::MoveDown) {
+				if (pos.x < 0) {
+					pos.x = 0;
+				}
+				if (pos.x > 8) {
+					pos.x = 8;
+				}
 				fieldState[pos.x][pos.y] = true;
+
+				bool isFull = true;
+				for (int x = 0; x < fieldWidth; x++) {
+					if (fieldState[x][pos.y] == false) {
+						isFull = false;
+					}
+				}
+
+				if (isFull) {
+					for (int y = pos.y; y > 0; y--) {
+						for (int x = 0; x < fieldWidth; x++) {
+							fieldState[x][y] = fieldState[x][y-1];
+						}
+					}
+
+					for (int x = 0; x < fieldWidth; x++) {
+						fieldState[x][0] = false;
+					}
+				}
+
 				pos = origin;
 			}
 		}
@@ -94,8 +126,10 @@ int main() {
 		w.draw(block);
 
 		for (int x = 0; x < fieldWidth; x++) {
+			int cnt = 0;
 			for (int y = 0; y < fieldHeight; y++) {
 				if (fieldState[x][y] == true) {
+					cnt++;
 					sf::Vector2i obstacle(x, y);
 					block.setPosition(getPixelPosition(obstacle, blocksize));
 					w.draw(block);
