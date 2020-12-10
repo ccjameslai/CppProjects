@@ -60,6 +60,10 @@ int main() {
 				if (evt.key.code == sf::Keyboard::Right) {
 					action = Action::MoveRight;
 				}
+
+				if (evt.key.code == sf::Keyboard::Down) {
+					action = Action::MoveDown;
+				}
 			}		
 		}
 
