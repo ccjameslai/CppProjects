@@ -9,16 +9,21 @@ sf::Vector2f getPixelPosition(
 }
 
 int main() {
-	const int fieldWidth = 9;
-	const int fieldHeight = 15;
+	const int fieldWidth = 6;
+	const int fieldHeight = 10;
 
+	srand(time(NULL));
 	bool fieldState[fieldWidth][fieldHeight] = {};
-	for (int y = 3; y < fieldHeight; y++) {
+	for (int y = 9; y < fieldHeight; y++) {
 		for (int k = 1; k < 3; k++) {
 			fieldState[rand()%fieldWidth][y] = true;
 		}
 	}
 
+	sf::String words = "All Clear";
+	sf::Font font;
+	font.loadFromFile("BROADW.TTF");
+	sf::Text text(words, font);
 
 	sf::Texture blockTexture;
 	blockTexture.loadFromFile("block.png");
@@ -38,15 +43,17 @@ int main() {
 		MoveLeft,
 		MoveRight,
 		MoveDown,
-		Hold
+		Hold,
+		Drop,
 	};
 
-	sf::Clock clock; 
+	sf::Clock clock;
+	bool isGameOver = false;
 	while (w.isOpen())
 	{
-		sf::Event evt;
 		Action action = Action::Hold;
 
+		sf::Event evt;
 		if (w.pollEvent(evt)) {
 			if (evt.type == sf::Event::Closed) {
 				w.close();
@@ -64,11 +71,21 @@ int main() {
 				if (evt.key.code == sf::Keyboard::Down) {
 					action = Action::MoveDown;
 				}
+
+				if (evt.key.code == sf::Keyboard::Space) {
+					action = Action::Drop;
+				}
 			}		
 		}
 
 		if (clock.getElapsedTime().asSeconds() >= 0.5f) {
-			action = Action::MoveDown;
+			if (isGameOver) {
+				action = Action::Hold;
+			}
+			else {
+				action = Action::MoveDown;
+			}
+					
 			clock.restart();
 		}
 
@@ -85,6 +102,15 @@ int main() {
 		case (Action::MoveRight):
 			nextPos.x++;
 			break;
+		case (Action::Drop):
+			for (int y = fieldHeight - 1; y > 0; y--) {
+				if (fieldState[nextPos.x][y]) {
+					continue;
+				}
+				nextPos.y = y;
+				break;
+			}
+			break;
 		case (Action::Hold):
 			break;
 		}
@@ -94,13 +120,14 @@ int main() {
 			pos = nextPos;
 		}
 		else {
+			if (nextPos.x < 0) {
+				pos.x = nextPos.x + fieldWidth;
+			}
+			if (nextPos.x > fieldWidth-1) {
+				pos.x = nextPos.x - fieldWidth;
+			}
+
 			if (action == Action::MoveDown) {
-				if (pos.x < 0) {
-					pos.x = 0;
-				}
-				if (pos.x > 8) {
-					pos.x = 8;
-				}
 				fieldState[pos.x][pos.y] = true;
 
 				bool isFull = true;
@@ -125,12 +152,12 @@ int main() {
 				pos = origin;
 			}
 		}
-
+		
 		block.setPosition(getPixelPosition(pos, blocksize));
 		w.draw(block);
 
+		int cnt = 0;
 		for (int x = 0; x < fieldWidth; x++) {
-			int cnt = 0;
 			for (int y = 0; y < fieldHeight; y++) {
 				if (fieldState[x][y] == true) {
 					cnt++;
@@ -139,6 +166,16 @@ int main() {
 					w.draw(block);
 				}
 			}
+		}
+
+		if (cnt == 0) {
+			// w.close();
+			text.setFillColor(sf::Color(125, 200, 75));
+			sf::Vector2i middlePostion(int(fieldWidth / 5), int(fieldHeight / 3));
+			text.setPosition(getPixelPosition(middlePostion, blocksize));
+			w.draw(text);
+
+			isGameOver = true;
 		}
 
 		w.display();
