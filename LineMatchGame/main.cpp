@@ -91,8 +91,6 @@ int main() {
 			clock.restart();
 		}
 
-		w.clear();
-
 		sf::Vector2f nextPos(pos);
 		switch (action) {
 		case (Action::MoveDown):
@@ -155,7 +153,9 @@ int main() {
 				pos = origin;
 			}
 		}
-		
+
+		w.clear();
+
 		block.setPosition(getPixelPosition(pos, blocksize));
 		w.draw(block);
 
@@ -182,7 +182,7 @@ int main() {
 		}
 		else if (fieldState[fieldWidth / 2][0]) {
 			gameover.setFillColor(sf::Color::Red);
-			sf::Vector2f middlePostion(fieldWidth / 8, fieldHeight / 3);
+			sf::Vector2f middlePostion(0.05, fieldHeight / 3);
 			gameover.setPosition(getPixelPosition(middlePostion, blocksize));
 			w.draw(gameover);
 
