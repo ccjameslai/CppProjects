@@ -3,8 +3,8 @@
 using namespace std;
 
 sf::Vector2f getPixelPosition(
-	const sf::Vector2i& pos, 
-	const sf::Vector2i& blocksize) {
+	const sf::Vector2f& pos, 
+	const sf::Vector2f& blocksize) {
 	return sf::Vector2f(float(pos.x * blocksize.x), float(pos.y * blocksize.y));
 }
 
@@ -14,27 +14,29 @@ int main() {
 
 	srand(time(NULL));
 	bool fieldState[fieldWidth][fieldHeight] = {};
-	for (int y = 9; y < fieldHeight; y++) {
+	for (int y = fieldHeight - 1; y < fieldHeight; y++) {
 		for (int k = 1; k < 3; k++) {
 			fieldState[rand()%fieldWidth][y] = true;
 		}
 	}
 
-	sf::String words = "All Clear";
 	sf::Font font;
 	font.loadFromFile("BROADW.TTF");
-	sf::Text text(words, font);
+
+	sf::Text allClear(sf::String("All Clear"), font);
+	sf::Text gameover(sf::String("Game Over"), font);
+
 
 	sf::Texture blockTexture;
 	blockTexture.loadFromFile("block.png");
-	sf::Vector2i blocksize(blockTexture.getSize());
+	sf::Vector2f blocksize(blockTexture.getSize());
 
 	sf::String title(L"簡易消行遊戲");
 	sf::VideoMode mode(fieldWidth * blocksize.x, fieldHeight * blocksize.y);
 	sf::RenderWindow w(mode , title);
 
-	sf::Vector2i origin(fieldWidth / 2, 0);
-	sf::Vector2i pos(origin);
+	sf::Vector2f origin(fieldWidth / 2, 0);
+	sf::Vector2f pos(origin);
 
 	sf::Sprite block(blockTexture);
 	block.setPosition(getPixelPosition(pos, blocksize));
@@ -91,7 +93,7 @@ int main() {
 
 		w.clear();
 
-		sf::Vector2i nextPos(pos);
+		sf::Vector2f nextPos(pos);
 		switch (action) {
 		case (Action::MoveDown):
 			nextPos.y++;
@@ -104,7 +106,7 @@ int main() {
 			break;
 		case (Action::Drop):
 			for (int y = fieldHeight - 1; y > 0; y--) {
-				if (fieldState[nextPos.x][y]) {
+				if (fieldState[int(nextPos.x)][y]) {
 					continue;
 				}
 				nextPos.y = y;
@@ -116,23 +118,24 @@ int main() {
 		}
 		
 		if (nextPos.x >= 0 && nextPos.x < fieldWidth &&
-			nextPos.y < fieldHeight && fieldState[nextPos.x][nextPos.y] == false) {
+			nextPos.y < fieldHeight && fieldState[int(nextPos.x)][int(nextPos.y)] == false) {
 			pos = nextPos;
 		}
 		else {
 			if (nextPos.x < 0) {
 				pos.x = nextPos.x + fieldWidth;
 			}
+			
 			if (nextPos.x > fieldWidth-1) {
 				pos.x = nextPos.x - fieldWidth;
 			}
 
 			if (action == Action::MoveDown) {
-				fieldState[pos.x][pos.y] = true;
+				fieldState[int(pos.x)][int(pos.y)] = true;
 
 				bool isFull = true;
 				for (int x = 0; x < fieldWidth; x++) {
-					if (fieldState[x][pos.y] == false) {
+					if (fieldState[x][int(pos.y)] == false) {
 						isFull = false;
 					}
 				}
@@ -161,7 +164,7 @@ int main() {
 			for (int y = 0; y < fieldHeight; y++) {
 				if (fieldState[x][y] == true) {
 					cnt++;
-					sf::Vector2i obstacle(x, y);
+					sf::Vector2f obstacle(x, y);
 					block.setPosition(getPixelPosition(obstacle, blocksize));
 					w.draw(block);
 				}
@@ -170,10 +173,18 @@ int main() {
 
 		if (cnt == 0) {
 			// w.close();
-			text.setFillColor(sf::Color(125, 200, 75));
-			sf::Vector2i middlePostion(int(fieldWidth / 5), int(fieldHeight / 3));
-			text.setPosition(getPixelPosition(middlePostion, blocksize));
-			w.draw(text);
+			allClear.setFillColor(sf::Color(125, 200, 75));
+			sf::Vector2f middlePostion(int(fieldWidth / 5), int(fieldHeight / 3));
+			allClear.setPosition(getPixelPosition(middlePostion, blocksize));
+			w.draw(allClear);
+
+			isGameOver = true;
+		}
+		else if (fieldState[fieldWidth / 2][0]) {
+			gameover.setFillColor(sf::Color::Red);
+			sf::Vector2f middlePostion(fieldWidth / 8, fieldHeight / 3);
+			gameover.setPosition(getPixelPosition(middlePostion, blocksize));
+			w.draw(gameover);
 
 			isGameOver = true;
 		}
