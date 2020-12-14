@@ -81,6 +81,24 @@ int main() {
 		}
 
 		if (isGameOver) {
+			if (evt.key.code == sf::Keyboard::R) {
+
+				isGameOver = false;
+				
+				for (int i = 0; i < fieldWidth; i++) {
+					for (int j = 0; j < fieldHeight; j++) {
+						fieldState[i][j] = false;
+					}
+				}
+
+				block.setPosition(getPixelPosition(sf::Vector2f(origin), blocksize));
+
+				for (int y = fieldHeight - 1; y < fieldHeight; y++) {
+					for (int k = 1; k < 3; k++) {
+						fieldState[rand() % fieldWidth][y] = true;
+					}
+				}
+			}
 			continue;
 		}
 
