@@ -80,14 +80,12 @@ int main() {
 			}		
 		}
 
+		if (isGameOver) {
+			continue;
+		}
+
 		if (clock.getElapsedTime().asSeconds() >= 0.5f) {
-			if (isGameOver) {
-				action = Action::Hold;
-			}
-			else {
-				action = Action::MoveDown;
-			}
-					
+			action = Action::MoveDown;
 			clock.restart();
 		}
 
