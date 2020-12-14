@@ -23,9 +23,10 @@ int main() {
 	sf::Font font;
 	font.loadFromFile("BROADW.TTF");
 
-	sf::Text allClear(sf::String("All Clear"), font);
-	sf::Text gameover(sf::String("Game Over"), font);
-
+	sf::Text allClear(sf::String("All Clear\n"), font);
+	sf::Text gameover(sf::String("Game Over\n"), font);
+	sf::Text restart(sf::String("press 'R' to restart"), font); 
+	restart.setCharacterSize(20);
 
 	sf::Texture blockTexture;
 	blockTexture.loadFromFile("block.png");
@@ -194,6 +195,12 @@ int main() {
 			allClear.setPosition(getPixelPosition(middlePostion, blocksize));
 			w.draw(allClear);
 
+			restart.setFillColor(sf::Color(0, 200, 75));
+			sf::Vector2f restartPostion(int(fieldWidth / 8), int(fieldHeight / 2));
+			restart.setPosition(getPixelPosition(restartPostion, blocksize));
+			w.draw(restart);
+			
+
 			isGameOver = true;
 		}
 		else if (fieldState[fieldWidth / 2][0]) {
@@ -201,6 +208,11 @@ int main() {
 			sf::Vector2f middlePostion(0.05, fieldHeight / 3);
 			gameover.setPosition(getPixelPosition(middlePostion, blocksize));
 			w.draw(gameover);
+
+			restart.setFillColor(sf::Color(0, 200, 75));
+			sf::Vector2f restartPostion(int(fieldWidth / 8), int(fieldHeight / 2));
+			restart.setPosition(getPixelPosition(restartPostion, blocksize));
+			w.draw(restart);
 
 			isGameOver = true;
 		}
