@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+using namespace std;
 
 int main() {
 	const int fieldWidth = 10;
@@ -25,12 +26,27 @@ int main() {
 	sf::Vector2i origin(fieldWidth / 2, 0);
 	sf::Vector2i pos(origin);
 
-	sf::Vector2i shape[4] = {
+	vector<sf::Vector2i> shape_O = {
 		sf::Vector2i(0,0),
 		sf::Vector2i(1,0),
 		sf::Vector2i(0,-1),
 		sf::Vector2i(1,-1)
 	};
+
+	vector<sf::Vector2i> shape_I = {
+		sf::Vector2i(-1,0),
+		sf::Vector2i(0,0),
+		sf::Vector2i(1,0),
+		sf::Vector2i(2,0)
+	};
+
+	vector<sf::Vector2i> shape;
+	if (rand() % 2 == 0) {
+		shape = shape_I;
+	}
+	else {
+		shape = shape_O;
+	}
 
 	block.setPosition(float(pos.x * blockWidth), float(pos.y * blockHeight));
 
@@ -112,6 +128,12 @@ int main() {
 					}
 				}
 				pos = origin;
+				if (rand() % 2 == 0) {
+					shape = shape_I;
+				}
+				else {
+					shape = shape_O;
+				}
 			}
 		}
 
