@@ -25,6 +25,13 @@ int main() {
 	sf::Vector2i origin(fieldWidth / 2, 0);
 	sf::Vector2i pos(origin);
 
+	sf::Vector2i shape[4] = {
+		sf::Vector2i(0,0),
+		sf::Vector2i(1,0),
+		sf::Vector2i(0,-1),
+		sf::Vector2i(1,-1)
+	};
+
 	block.setPosition(float(pos.x * blockWidth), float(pos.y * blockHeight));
 
 	enum class Action {
@@ -83,13 +90,27 @@ int main() {
 			break;
 		}
 
-		if (nextPos.x >= 0 && nextPos.x < fieldWidth &&
-			nextPos.y < fieldHeight && fieldState[nextPos.x][nextPos.y] == false) {
+		int countEmpty = 0;
+		for (auto s : shape) {
+			sf::Vector2i np = nextPos + s;
+			if (np.x >= 0 && np.x < fieldWidth &&
+				np.y < fieldHeight &&
+				(np.y < 0 || fieldState[np.x][np.y] == false)) {
+				countEmpty++;
+			}
+		}
+		
+		if (countEmpty == 4) {
 			pos = nextPos;
 		}
 		else {
 			if (action == Action::MOVEDOWN) {
-				fieldState[pos.x][pos.y] = true;
+				for (auto s : shape) {
+					sf::Vector2i np = pos + s;
+					if (np.y >= 0) {
+						fieldState[np.x][np.y] = true;
+					}
+				}
 				pos = origin;
 			}
 		}
@@ -105,9 +126,11 @@ int main() {
 			}
 		}
 
-		block.setPosition(float(pos.x* blockWidth), float(pos.y* blockHeight));
+		for (auto s : shape) {
+			block.setPosition(float((pos.x + s.x)* blockWidth), float((pos.y + s.y)* blockHeight));
+			w.draw(block);
+		}
 		
-		w.draw(block);
 		w.display();
 	}
 
