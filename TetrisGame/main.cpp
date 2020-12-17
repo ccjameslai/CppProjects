@@ -4,6 +4,8 @@ int main() {
 	const int fieldWidth = 10;
 	const int fieldHeight = 20;
 
+	bool fieldState[fieldWidth][fieldHeight] = {};
+
 	sf::Texture texture;
 	if (!texture.loadFromFile("blue.png")) {
 		return EXIT_FAILURE;
@@ -59,7 +61,7 @@ int main() {
 			}
 		}
 
-		if (clock.getElapsedTime().asSeconds() >= 0.3f) {
+		if (clock.getElapsedTime().asSeconds() >= 0.5f) {
 			action = Action::MOVEDOWN;
 
 			clock.restart();
@@ -82,12 +84,29 @@ int main() {
 		}
 
 		if (nextPos.x >= 0 && nextPos.x < fieldWidth &&
-			nextPos.y < fieldHeight) {
+			nextPos.y < fieldHeight && fieldState[nextPos.x][nextPos.y] == false) {
 			pos = nextPos;
+		}
+		else {
+			if (action == Action::MOVEDOWN) {
+				fieldState[pos.x][pos.y] = true;
+				pos = origin;
+			}
 		}
 
 		w.clear();
+
+		for (int x = 0; x < fieldWidth; x++) {
+			for (int y = 0; y < fieldHeight; y++) {
+				if (fieldState[x][y]) {
+					block.setPosition(float(x * blockWidth), float(y * blockHeight));
+					w.draw(block);
+				}
+			}
+		}
+
 		block.setPosition(float(pos.x* blockWidth), float(pos.y* blockHeight));
+		
 		w.draw(block);
 		w.display();
 	}
