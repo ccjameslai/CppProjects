@@ -7,21 +7,24 @@ int main() {
 
 	bool fieldState[fieldWidth][fieldHeight] = {};
 
-	sf::Texture texture;
-	if (!texture.loadFromFile("blue.png")) {
+	sf::Texture blueTexture;
+	if (!blueTexture.loadFromFile("blue.png")) {
 		return EXIT_FAILURE;
 	}
 
-	const int blockWidth = texture.getSize().x;
-	const int blockHeight = texture.getSize().y;
+	sf::Texture yellowTexture;
+	if (!yellowTexture.loadFromFile("yellow.png")) {
+		return EXIT_FAILURE;
+	}
+
+	const int blockWidth = blueTexture.getSize().x;
+	const int blockHeight = blueTexture.getSize().y;
 
 	const int windowWidth = fieldWidth * blockWidth;
 	const int windowHeight = fieldHeight * blockHeight;
 
 	sf::VideoMode mode(windowWidth, windowHeight);
 	sf::RenderWindow w(mode, L"俄羅斯方塊");
-
-	sf::Sprite block(texture);
 	
 	sf::Vector2i origin(fieldWidth / 2, 0);
 	sf::Vector2i pos(origin);
@@ -40,15 +43,20 @@ int main() {
 		sf::Vector2i(2,0)
 	};
 
-	vector<sf::Vector2i> shape;
-	if (rand() % 2 == 0) {
-		shape = shape_I;
-	}
-	else {
-		shape = shape_O;
-	}
+	enum class BlockType {
+		O,
+		I,
+	};
 
-	block.setPosition(float(pos.x * blockWidth), float(pos.y * blockHeight));
+	BlockType blockType = BlockType(rand() % 2);
+	
+	vector<sf::Vector2i> currentShape;
+
+	sf::Sprite currentBlock;
+	sf::Sprite yellowBlock(yellowTexture);
+	//yellowBlock.setPosition(float(pos.x * blockWidth), float(pos.y * blockHeight));
+	sf::Sprite blueBlock(blueTexture);
+	//blueBlock.setPosition(float(pos.x * blockWidth), float(pos.y * blockHeight));*/
 
 	enum class Action {
 		MOVEDOWN,
@@ -62,6 +70,15 @@ int main() {
 	while (w.isOpen()) {
 		sf::Event evt;
 		
+		if (blockType == BlockType::I) {
+			currentShape = shape_I;
+			currentBlock = yellowBlock;
+		}
+		else if (blockType == BlockType::O) {
+			currentShape = shape_O;
+			currentBlock = blueBlock;
+		}
+
 		Action action = Action::HOLD;
 
 		if (w.pollEvent(evt)) {
@@ -107,7 +124,7 @@ int main() {
 		}
 
 		int countEmpty = 0;
-		for (auto s : shape) {
+		for (auto s : currentShape) {
 			sf::Vector2i np = nextPos + s;
 			if (np.x >= 0 && np.x < fieldWidth &&
 				np.y < fieldHeight &&
@@ -121,36 +138,32 @@ int main() {
 		}
 		else {
 			if (action == Action::MOVEDOWN) {
-				for (auto s : shape) {
+				for (auto s : currentShape) {
 					sf::Vector2i np = pos + s;
 					if (np.y >= 0) {
 						fieldState[np.x][np.y] = true;
 					}
 				}
 				pos = origin;
-				if (rand() % 2 == 0) {
-					shape = shape_I;
-				}
-				else {
-					shape = shape_O;
-				}
+				blockType = BlockType(rand() % 2);
 			}
 		}
 
 		w.clear();
 
+		// 繪製場地
 		for (int x = 0; x < fieldWidth; x++) {
 			for (int y = 0; y < fieldHeight; y++) {
 				if (fieldState[x][y]) {
-					block.setPosition(float(x * blockWidth), float(y * blockHeight));
-					w.draw(block);
+					currentBlock.setPosition(float(x * blockWidth), float(y * blockHeight));
+					w.draw(currentBlock);
 				}
 			}
 		}
 
-		for (auto s : shape) {
-			block.setPosition(float((pos.x + s.x)* blockWidth), float((pos.y + s.y)* blockHeight));
-			w.draw(block);
+		for (auto s : currentShape) {
+			currentBlock.setPosition(float((pos.x + s.x)* blockWidth), float((pos.y + s.y)* blockHeight));
+			w.draw(currentBlock);
 		}
 		
 		w.display();
