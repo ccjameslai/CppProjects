@@ -35,27 +35,41 @@ int main() {
 	sf::Vector2i origin(fieldWidth / 2, 0);
 	sf::Vector2i pos(origin);
 
-	vector<sf::Vector2i> shape_O = {
-		sf::Vector2i(0,0),
-		sf::Vector2i(1,0),
-		sf::Vector2i(0,-1),
-		sf::Vector2i(1,-1)
+	vector<vector<vector<sf::Vector2i>>> shapes = {
+		// shape O
+		{
+			{
+				sf::Vector2i(0,0),
+				sf::Vector2i(1,0),
+				sf::Vector2i(0,-1),
+				sf::Vector2i(1,-1)
+			}
+		},
+		// shape I
+		{
+			{
+				sf::Vector2i(-1,0),
+				sf::Vector2i(0,0),
+				sf::Vector2i(1,0),
+				sf::Vector2i(2,0)
+			},
+			{
+				sf::Vector2i(0,-2),
+				sf::Vector2i(0,-1),
+				sf::Vector2i(0,0),
+				sf::Vector2i(0,1)
+			},
+		}
 	};
-
-	vector<sf::Vector2i> shape_I = {
-		sf::Vector2i(-1,0),
-		sf::Vector2i(0,0),
-		sf::Vector2i(1,0),
-		sf::Vector2i(2,0)
-	};
-
+		
 	BlockType currentType = BlockType(rand() % 2 + 1);
-	
 	vector<sf::Vector2i> currentShape;
-
-	sf::Sprite currentBlock;
-	sf::Sprite yellowBlock(yellowTexture);
-	sf::Sprite blueBlock(blueTexture);
+	sf::Sprite currentSprite;
+	
+	vector<sf::Sprite> sprites = {
+		sf::Sprite(yellowTexture),
+		sf::Sprite(blueTexture),
+	};
 
 	enum class Action {
 		MOVEDOWN,
@@ -68,15 +82,9 @@ int main() {
 
 	while (w.isOpen()) {
 		sf::Event evt;
-		
-		if (currentType == BlockType::I) {
-			currentShape = shape_I;
-			currentBlock = yellowBlock;
-		}
-		else if (currentType == BlockType::O) {
-			currentShape = shape_O;
-			currentBlock = blueBlock;
-		}
+
+		currentShape = shapes[int(currentType) - 1][0];
+		currentSprite = sprites[int(currentType) - 1];
 
 		Action action = Action::HOLD;
 
@@ -153,21 +161,18 @@ int main() {
 		// Ã¸»s³õ¦a
 		for (int x = 0; x < fieldWidth; x++) {
 			for (int y = 0; y < fieldHeight; y++) {
-				sf::Sprite fieldBlock;
-				if (fieldState[x][y] == BlockType::I) {
-					fieldBlock = yellowBlock;
-				}
-				else if (fieldState[x][y] == BlockType::O) {
-					fieldBlock = blueBlock;
-				}
+				if (fieldState[x][y] == BlockType::None) continue;
+				
+				sf::Sprite fieldBlock = sprites[int(fieldState[x][y]) - 1];
+
 				fieldBlock.setPosition(float(x* blockWidth), float(y* blockHeight));
 				w.draw(fieldBlock);
 			}
 		}
 
 		for (auto s : currentShape) {
-			currentBlock.setPosition(float((pos.x + s.x)* blockWidth), float((pos.y + s.y)* blockHeight));
-			w.draw(currentBlock);
+			currentSprite.setPosition(float((pos.x + s.x)* blockWidth), float((pos.y + s.y)* blockHeight));
+			w.draw(currentSprite);
 		}
 		
 		w.display();
