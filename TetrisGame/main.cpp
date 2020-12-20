@@ -65,7 +65,8 @@ int main() {
 	BlockType currentType = BlockType(rand() % 2 + 1);
 	vector<sf::Vector2i> currentShape;
 	sf::Sprite currentSprite;
-	
+	int currentIndex = 0;
+
 	vector<sf::Sprite> sprites = {
 		sf::Sprite(yellowTexture),
 		sf::Sprite(blueTexture),
@@ -76,6 +77,7 @@ int main() {
 		MOVELEFT,
 		MOVERIGHT,
 		HOLD,
+		ROTATE,
 	};
 	
 	sf::Clock clock;
@@ -83,7 +85,7 @@ int main() {
 	while (w.isOpen()) {
 		sf::Event evt;
 
-		currentShape = shapes[int(currentType) - 1][0];
+		currentShape = shapes[int(currentType) - 1][currentIndex];
 		currentSprite = sprites[int(currentType) - 1];
 
 		Action action = Action::HOLD;
@@ -105,6 +107,10 @@ int main() {
 				if (evt.key.code == sf::Keyboard::Right) {
 					action = Action::MOVERIGHT;
 				}
+
+				if (evt.key.code == sf::Keyboard::Up) {
+					action = Action::ROTATE;
+				}
 			}
 		}
 
@@ -115,6 +121,11 @@ int main() {
 		}
 
 		sf::Vector2i nextPos(pos);
+		int nextIndex = currentIndex;
+		if (action == Action::ROTATE) {
+			nextIndex = (nextIndex + 1) % shapes[int(currentType) - 1].size();
+		}
+		vector<sf::Vector2i> nextShape = shapes[int(currentType) - 1][nextIndex];
 
 		switch (action) {
 		case Action::MOVEDOWN:
@@ -131,7 +142,7 @@ int main() {
 		}
 
 		int countEmpty = 0;
-		for (auto s : currentShape) {
+		for (auto s : nextShape) {
 			sf::Vector2i np = nextPos + s;
 			if (np.x >= 0 && np.x < fieldWidth &&
 				np.y < fieldHeight &&
@@ -142,6 +153,8 @@ int main() {
 		
 		if (countEmpty == 4) {
 			pos = nextPos;
+			currentShape = nextShape;
+			currentIndex = nextIndex;
 		}
 		else {
 			if (action == Action::MOVEDOWN) {
@@ -153,6 +166,7 @@ int main() {
 				}
 				pos = origin;
 				currentType = BlockType(rand() % 2 + 1);
+				currentIndex = 0;
 			}
 		}
 
