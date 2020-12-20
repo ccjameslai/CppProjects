@@ -5,7 +5,13 @@ int main() {
 	const int fieldWidth = 10;
 	const int fieldHeight = 20;
 
-	bool fieldState[fieldWidth][fieldHeight] = {};
+	enum class BlockType {
+		None,
+		O,
+		I,
+	};
+
+	BlockType fieldState[fieldWidth][fieldHeight] = {};
 
 	sf::Texture blueTexture;
 	if (!blueTexture.loadFromFile("blue.png")) {
@@ -43,20 +49,13 @@ int main() {
 		sf::Vector2i(2,0)
 	};
 
-	enum class BlockType {
-		O,
-		I,
-	};
-
-	BlockType blockType = BlockType(rand() % 2);
+	BlockType currentType = BlockType(rand() % 2 + 1);
 	
 	vector<sf::Vector2i> currentShape;
 
 	sf::Sprite currentBlock;
 	sf::Sprite yellowBlock(yellowTexture);
-	//yellowBlock.setPosition(float(pos.x * blockWidth), float(pos.y * blockHeight));
 	sf::Sprite blueBlock(blueTexture);
-	//blueBlock.setPosition(float(pos.x * blockWidth), float(pos.y * blockHeight));*/
 
 	enum class Action {
 		MOVEDOWN,
@@ -65,16 +64,16 @@ int main() {
 		HOLD,
 	};
 	
-
 	sf::Clock clock;
+
 	while (w.isOpen()) {
 		sf::Event evt;
 		
-		if (blockType == BlockType::I) {
+		if (currentType == BlockType::I) {
 			currentShape = shape_I;
 			currentBlock = yellowBlock;
 		}
-		else if (blockType == BlockType::O) {
+		else if (currentType == BlockType::O) {
 			currentShape = shape_O;
 			currentBlock = blueBlock;
 		}
@@ -128,7 +127,7 @@ int main() {
 			sf::Vector2i np = nextPos + s;
 			if (np.x >= 0 && np.x < fieldWidth &&
 				np.y < fieldHeight &&
-				(np.y < 0 || fieldState[np.x][np.y] == false)) {
+				(np.y < 0 || fieldState[np.x][np.y] == BlockType::None)) {
 				countEmpty++;
 			}
 		}
@@ -141,11 +140,11 @@ int main() {
 				for (auto s : currentShape) {
 					sf::Vector2i np = pos + s;
 					if (np.y >= 0) {
-						fieldState[np.x][np.y] = true;
+						fieldState[np.x][np.y] = currentType;
 					}
 				}
 				pos = origin;
-				blockType = BlockType(rand() % 2);
+				currentType = BlockType(rand() % 2 + 1);
 			}
 		}
 
@@ -154,10 +153,15 @@ int main() {
 		// Ã¸»s³õ¦a
 		for (int x = 0; x < fieldWidth; x++) {
 			for (int y = 0; y < fieldHeight; y++) {
-				if (fieldState[x][y]) {
-					currentBlock.setPosition(float(x * blockWidth), float(y * blockHeight));
-					w.draw(currentBlock);
+				sf::Sprite fieldBlock;
+				if (fieldState[x][y] == BlockType::I) {
+					fieldBlock = yellowBlock;
 				}
+				else if (fieldState[x][y] == BlockType::O) {
+					fieldBlock = blueBlock;
+				}
+				fieldBlock.setPosition(float(x* blockWidth), float(y* blockHeight));
+				w.draw(fieldBlock);
 			}
 		}
 
