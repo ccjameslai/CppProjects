@@ -85,6 +85,24 @@ int main() {
 					sf::Vector2i(0, -1),
 					sf::Vector2i(0, 0),
 					sf::Vector2i(1, 0),
+				},
+				{
+					sf::Vector2i(2, 0),
+					sf::Vector2i(1, 0),
+					sf::Vector2i(0, 0),
+					sf::Vector2i(0, 1),
+				},
+				{
+					sf::Vector2i(-1, 0),
+					sf::Vector2i(0, 0),
+					sf::Vector2i(0, 1),
+					sf::Vector2i(0, 2),
+				},
+				{
+					sf::Vector2i(-2, 0),
+					sf::Vector2i(-1, 0),
+					sf::Vector2i(0, 0),
+					sf::Vector2i(0, -1),
 				}
 			}
 		}
@@ -95,7 +113,7 @@ int main() {
 		backgroundTexture, 
 		sf::IntRect(0, 0, windowWidth, windowHeight));
 
-	BlockType currentType = BlockType(rand() % 2 + 1);
+	BlockType currentType = BlockType(rand() % 3 + 1);
 	vector<sf::Vector2i> currentShape;
 	sf::Sprite currentSprite;
 	int currentIndex = 0;
@@ -103,6 +121,7 @@ int main() {
 	map<BlockType, sf::Sprite> sprites = {
 		{BlockType::I, sf::Sprite(yellowTexture)},
 		{BlockType::O, sf::Sprite(blueTexture)},
+		{BlockType::L, sf::Sprite(greenTexture)},
 	};
 
 	enum class Action {
@@ -220,7 +239,7 @@ int main() {
 				}
 
 				pos = origin;
-				currentType = BlockType(rand() % 2 + 1);
+				currentType = BlockType(rand() % 3 + 1);
 				currentIndex = 0;
 			}
 		}
