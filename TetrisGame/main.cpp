@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
 using namespace std;
 
 int main() {
@@ -10,6 +11,10 @@ int main() {
 		O,
 		I,
 		L,
+		INVL,
+		T,
+		Z,
+		INVZ,
 	};
 
 	BlockType fieldState[fieldWidth][fieldHeight] = {};
@@ -26,6 +31,26 @@ int main() {
 
 	sf::Texture greenTexture;
 	if (!greenTexture.loadFromFile("green.png")) {
+		return EXIT_FAILURE;
+	}
+
+	sf::Texture purpleTexture;
+	if (!purpleTexture.loadFromFile("purple.png")) {
+		return EXIT_FAILURE;
+	}
+
+	sf::Texture redTexture;
+	if (!redTexture.loadFromFile("red.png")) {
+		return EXIT_FAILURE;
+	}
+
+	sf::Texture lightblueTexture;
+	if (!lightblueTexture.loadFromFile("lightblue.png")) {
+		return EXIT_FAILURE;
+	}
+
+	sf::Texture orangeTexture;
+	if (!orangeTexture.loadFromFile("orange.png")) {
 		return EXIT_FAILURE;
 	}
 
@@ -47,7 +72,98 @@ int main() {
 	sf::Vector2i pos(origin);
 
 	map<BlockType, vector<vector<sf::Vector2i>>> shapes = {
-		// shape O
+		{
+			BlockType::INVL,
+			{
+				{
+					sf::Vector2i(0,-2),
+					sf::Vector2i(0,-1),
+					sf::Vector2i(0,0),
+					sf::Vector2i(-1,0)
+				},
+				{
+					sf::Vector2i(0,-1),
+					sf::Vector2i(0,0),
+					sf::Vector2i(1,0),
+					sf::Vector2i(2,0)
+				},
+				{
+					sf::Vector2i(0,0),
+					sf::Vector2i(0,1),
+					sf::Vector2i(0,2),
+					sf::Vector2i(1,0)
+				},
+				{
+					sf::Vector2i(-2,0),
+					sf::Vector2i(-1,0),
+					sf::Vector2i(0,0),
+					sf::Vector2i(0,1)
+				}
+			}
+		},
+		{
+			BlockType::Z,
+			{
+				{
+					sf::Vector2i(-1,-1),
+					sf::Vector2i(0,-1),
+					sf::Vector2i(0,0),
+					sf::Vector2i(1,0)
+				},
+				{
+					sf::Vector2i(1,-1),
+					sf::Vector2i(1,0),
+					sf::Vector2i(0,0),
+					sf::Vector2i(0,1)
+				},
+			}
+		},
+		{
+			BlockType::INVZ,
+			{
+				{
+					sf::Vector2i(0,-1),
+					sf::Vector2i(1,-1),
+					sf::Vector2i(0,0),
+					sf::Vector2i(-1,0)
+				},
+				{
+					sf::Vector2i(0,-1),
+					sf::Vector2i(0,0),
+					sf::Vector2i(1,0),
+					sf::Vector2i(1,1)
+				},
+			}
+		},
+		{
+			BlockType::T,
+			{
+				{
+					sf::Vector2i(1,0),
+					sf::Vector2i(0,0),
+					sf::Vector2i(0,-1),
+					sf::Vector2i(-1,0)
+				},
+				{
+					sf::Vector2i(1,0),
+					sf::Vector2i(0,0),
+					sf::Vector2i(0,-1),
+					sf::Vector2i(0,1)
+				},
+				{
+					sf::Vector2i(-1,0),
+					sf::Vector2i(0,0),
+					sf::Vector2i(1,0),
+					sf::Vector2i(0,1)
+				},
+				{
+					sf::Vector2i(0,-1),
+					sf::Vector2i(0,0),
+					sf::Vector2i(0,1),
+					sf::Vector2i(-1,0)
+				}
+			}
+		},
 		{
 			BlockType::O,
 			{
@@ -59,7 +175,6 @@ int main() {
 				}
 			}
 		},
-		// shape I
 		{
 			BlockType::I,
 			{
@@ -113,7 +228,7 @@ int main() {
 		backgroundTexture, 
 		sf::IntRect(0, 0, windowWidth, windowHeight));
 
-	BlockType currentType = BlockType(rand() % 3 + 1);
+	BlockType currentType = BlockType(rand() % shapes.size() + 1);
 	vector<sf::Vector2i> currentShape;
 	sf::Sprite currentSprite;
 	int currentIndex = 0;
@@ -121,7 +236,11 @@ int main() {
 	map<BlockType, sf::Sprite> sprites = {
 		{BlockType::I, sf::Sprite(yellowTexture)},
 		{BlockType::O, sf::Sprite(blueTexture)},
-		{BlockType::L, sf::Sprite(greenTexture)},
+		{BlockType::T, sf::Sprite(greenTexture)},
+		{BlockType::L, sf::Sprite(purpleTexture)},
+		{BlockType::INVL, sf::Sprite(redTexture)},
+		{BlockType::Z, sf::Sprite(lightblueTexture)},
+		{BlockType::INVZ, sf::Sprite(orangeTexture)},
 	};
 
 	enum class Action {
@@ -239,7 +358,7 @@ int main() {
 				}
 
 				pos = origin;
-				currentType = BlockType(rand() % 3 + 1);
+				currentType = BlockType(rand() % shapes.size() + 1);
 				currentIndex = 0;
 			}
 		}
