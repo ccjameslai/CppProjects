@@ -9,6 +9,7 @@ int main() {
 		None,
 		O,
 		I,
+		L,
 	};
 
 	BlockType fieldState[fieldWidth][fieldHeight] = {};
@@ -20,6 +21,16 @@ int main() {
 
 	sf::Texture yellowTexture;
 	if (!yellowTexture.loadFromFile("yellow.png")) {
+		return EXIT_FAILURE;
+	}
+
+	sf::Texture greenTexture;
+	if (!greenTexture.loadFromFile("green.png")) {
+		return EXIT_FAILURE;
+	}
+
+	sf::Texture backgroundTexture;
+	if (!backgroundTexture.loadFromFile("background.png")) {
 		return EXIT_FAILURE;
 	}
 
@@ -35,41 +46,63 @@ int main() {
 	sf::Vector2i origin(fieldWidth / 2, 0);
 	sf::Vector2i pos(origin);
 
-	vector<vector<vector<sf::Vector2i>>> shapes = {
+	map<BlockType, vector<vector<sf::Vector2i>>> shapes = {
 		// shape O
 		{
+			BlockType::O,
 			{
-				sf::Vector2i(0,0),
-				sf::Vector2i(1,0),
-				sf::Vector2i(0,-1),
-				sf::Vector2i(1,-1)
+				{
+					sf::Vector2i(0,0),
+					sf::Vector2i(1,0),
+					sf::Vector2i(0,-1),
+					sf::Vector2i(1,-1)
+				}
 			}
 		},
 		// shape I
 		{
+			BlockType::I,
 			{
-				sf::Vector2i(-1,0),
-				sf::Vector2i(0,0),
-				sf::Vector2i(1,0),
-				sf::Vector2i(2,0)
-			},
+				{
+					sf::Vector2i(-1,0),
+					sf::Vector2i(0,0),
+					sf::Vector2i(1,0),
+					sf::Vector2i(2,0)
+				},
+				{
+					sf::Vector2i(0,-2),
+					sf::Vector2i(0,-1),
+					sf::Vector2i(0,0),
+					sf::Vector2i(0,1)
+				}
+			}
+		},
+		{
+			BlockType::L,
 			{
-				sf::Vector2i(0,-2),
-				sf::Vector2i(0,-1),
-				sf::Vector2i(0,0),
-				sf::Vector2i(0,1)
-			},
+				{
+					sf::Vector2i(0, -2),
+					sf::Vector2i(0, -1),
+					sf::Vector2i(0, 0),
+					sf::Vector2i(1, 0),
+				}
+			}
 		}
 	};
-		
+	
+	backgroundTexture.setRepeated(true);
+	sf::Sprite backgroundSprite(
+		backgroundTexture, 
+		sf::IntRect(0, 0, windowWidth, windowHeight));
+
 	BlockType currentType = BlockType(rand() % 2 + 1);
 	vector<sf::Vector2i> currentShape;
 	sf::Sprite currentSprite;
 	int currentIndex = 0;
 
-	vector<sf::Sprite> sprites = {
-		sf::Sprite(yellowTexture),
-		sf::Sprite(blueTexture),
+	map<BlockType, sf::Sprite> sprites = {
+		{BlockType::I, sf::Sprite(yellowTexture)},
+		{BlockType::O, sf::Sprite(blueTexture)},
 	};
 
 	enum class Action {
@@ -85,8 +118,8 @@ int main() {
 	while (w.isOpen()) {
 		sf::Event evt;
 
-		currentShape = shapes[int(currentType) - 1][currentIndex];
-		currentSprite = sprites[int(currentType) - 1];
+		currentShape = shapes[currentType][currentIndex];
+		currentSprite = sprites[currentType];
 
 		Action action = Action::HOLD;
 
@@ -123,9 +156,9 @@ int main() {
 		sf::Vector2i nextPos(pos);
 		int nextIndex = currentIndex;
 		if (action == Action::ROTATE) {
-			nextIndex = (nextIndex + 1) % shapes[int(currentType) - 1].size();
+			nextIndex = (nextIndex + 1) % shapes[currentType].size();
 		}
-		vector<sf::Vector2i> nextShape = shapes[int(currentType) - 1][nextIndex];
+		vector<sf::Vector2i> nextShape = shapes[currentType][nextIndex];
 
 		switch (action) {
 		case Action::MOVEDOWN:
@@ -141,6 +174,7 @@ int main() {
 			break;
 		}
 
+		// 檢查下一個位置是否合法
 		int countEmpty = 0;
 		for (auto s : nextShape) {
 			sf::Vector2i np = nextPos + s;
@@ -164,6 +198,27 @@ int main() {
 						fieldState[np.x][np.y] = currentType;
 					}
 				}
+
+				for (int y = 0; y < fieldHeight; y++) {
+					bool isFull = true;
+					for (int x = 0; x < fieldWidth; x++) {
+						if (fieldState[x][y] == BlockType::None) {
+							isFull = false;
+						}
+					}
+
+					if (isFull) {
+						for (int ty = y; ty > 0; ty--) {
+							for (int x = 0; x < fieldWidth; x++) {
+								fieldState[x][ty] = fieldState[x][ty-1];
+							}
+						}
+						for (int x = 0; x < fieldWidth; x++) {
+							fieldState[x][0] = BlockType::None;
+						}
+					}
+				}
+
 				pos = origin;
 				currentType = BlockType(rand() % 2 + 1);
 				currentIndex = 0;
@@ -172,12 +227,14 @@ int main() {
 
 		w.clear();
 
+
+		w.draw(backgroundSprite);
 		// 繪製場地
 		for (int x = 0; x < fieldWidth; x++) {
 			for (int y = 0; y < fieldHeight; y++) {
 				if (fieldState[x][y] == BlockType::None) continue;
 				
-				sf::Sprite fieldBlock = sprites[int(fieldState[x][y]) - 1];
+				sf::Sprite fieldBlock = sprites[fieldState[x][y]];
 
 				fieldBlock.setPosition(float(x* blockWidth), float(y* blockHeight));
 				w.draw(fieldBlock);
