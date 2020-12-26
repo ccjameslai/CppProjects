@@ -1,8 +1,18 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
+
+using namespace std;
 
 int main() {
-	int confirmed = 100000;
-	int death = 1000;
+	const string data = "{\"TotalConfirmed\": 79828488, \"TotalDeaths\" : 1750474, \"TotalRecovered\" : 44992928}";
+
+	int confirmedPos = data.find(":") + 1;
+	int confirmedEnd = data.find(",");
+	string confirmed = data.substr(confirmedPos, confirmedEnd - confirmedPos);
+
+	int deadthPos = data.find(":", confirmedEnd);
+	int deadthEnd = data.find(",", deadthPos);
+	string deadth = data.substr(deadthPos, deadthEnd - deadthPos);
 
 	sf::RenderWindow w(sf::VideoMode(400, 160), L"COVID-19");
 
@@ -27,11 +37,11 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
-	sf::String confirmedString(std::to_string(confirmed));
+	sf::String confirmedString(confirmed);
 	sf::Text confirmedText(confirmedString, font);
 	confirmedText.setPosition(200, 20);
 
-	sf::String deadthString(std::to_string(death));
+	sf::String deadthString(deadth);
 	sf::Text deadthText(deadthString, font);
 	deadthText.setPosition(200, 80);
 
