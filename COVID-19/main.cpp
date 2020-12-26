@@ -1,6 +1,9 @@
 #include <SFML/Graphics.hpp>
 
 int main() {
+	int confirmed = 100000;
+	int death = 1000;
+
 	sf::RenderWindow w(sf::VideoMode(400, 160), L"COVID-19");
 
 	sf::Texture confirmedTexture;
@@ -16,9 +19,21 @@ int main() {
 	sf::Sprite confirmedSprite(confirmedTexture);
 	confirmedSprite.setPosition(15, 20);
 
-	sf::Sprite deathSprite(deathTexture);
-	deathSprite.setPosition(15, 80);
+	sf::Sprite deadthSprite(deathTexture);
+	deadthSprite.setPosition(15, 80);
 
+	sf::Font font;
+	if (!font.loadFromFile("SentyGoldenBell.ttf")) {
+		return EXIT_FAILURE;
+	}
+
+	sf::String confirmedString(std::to_string(confirmed));
+	sf::Text confirmedText(confirmedString, font);
+	confirmedText.setPosition(200, 20);
+
+	sf::String deadthString(std::to_string(death));
+	sf::Text deadthText(deadthString, font);
+	deadthText.setPosition(200, 80);
 
 	while (w.isOpen()) {
 		sf::Event evt;
@@ -30,7 +45,9 @@ int main() {
 
 		w.clear();
 		w.draw(confirmedSprite);
-		w.draw(deathSprite);
+		w.draw(deadthSprite);
+		w.draw(confirmedText);
+		w.draw(deadthText);
 		w.display();
 	}
 
