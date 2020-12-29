@@ -4,6 +4,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <httplib.h>
+#include <time.h>
 
 using namespace std;
 
@@ -17,7 +18,7 @@ int main() {
 	int death = j["TotalDeaths"];
 	int recovered = j["TotalRecovered"];
 
-	sf::RenderWindow w(sf::VideoMode(400, 200), L"COVID-19");
+	sf::RenderWindow w(sf::VideoMode(400, 240), L"COVID-19");
 
 	sf::Texture confirmedTexture;
 	if (!confirmedTexture.loadFromFile("confirmed.png")) {
@@ -34,8 +35,8 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
-	sf::Vector2i spritePos(15, 20);
-	sf::Vector2i textPos(220, 20);
+	sf::Vector2f spritePos(15, 20);
+	sf::Vector2f textPos(220, 20);
 
 	sf::Sprite confirmedSprite(confirmedTexture);
 	confirmedSprite.setPosition(spritePos.x, spritePos.y);
@@ -63,6 +64,23 @@ int main() {
 	sf::Text recoveredText(recoveredString, font);
 	recoveredText.setPosition(textPos.x, textPos.y + 120);
 
+	struct tm newtime;
+	time_t now = time(0);
+	localtime_s(&newtime, &now);
+	char buffer[80];
+     
+	sf::Font fontDate;
+	if (!fontDate.loadFromFile("msjhbd.ttc")) {
+		return EXIT_FAILURE;
+	}
+
+	strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", &newtime);
+
+	sf::String updateDateString(L"上次更新於: ");
+
+	sf::Text updateDateText(updateDateString + buffer, fontDate, 20);
+	updateDateText.setPosition(spritePos.x, spritePos.y + 180);
+
 	while (w.isOpen()) {
 		w.setFramerateLimit(33);
 		sf::Event evt;
@@ -77,6 +95,7 @@ int main() {
 		w.draw(confirmedSprite);
 		w.draw(deathSprite);
 		w.draw(recoveredSprite);
+		w.draw(updateDateText);
 
 		w.draw(confirmedText);
 		w.draw(deathText);
