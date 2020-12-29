@@ -1,11 +1,15 @@
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <httplib.h>
 
 using namespace std;
 
 int main() {
-	const string data = "{\"TotalConfirmed\": 79828488, \"TotalDeaths\" : 1750474, \"TotalRecovered\" : 44992928}";
+	httplib::SSLClient client("api.covid19api.com");
+	const string data = client.Get("/world/total")->body;
 
 	nlohmann::json j = nlohmann::json::parse(data);
 
