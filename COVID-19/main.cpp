@@ -10,6 +10,7 @@ using namespace std;
 
 string getCurrentTime();
 void updateData(int, sf::Font, sf::Vector2f, int shift=0);
+//void updateData(sf::Text&, int, sf::Font, sf::Vector2f, int shift=0);
 
 int main() {
 	httplib::SSLClient client("api.covid19api.com");
@@ -89,7 +90,7 @@ int main() {
 			}
 		}
 
-		if (clock.getElapsedTime().asSeconds() > 60.f) {
+		if (clock.getElapsedTime().asSeconds() > 10.f) {
 			httplib::SSLClient client("api.covid19api.com");
 			const string data = client.Get("/world/total")->body;
 
@@ -99,6 +100,7 @@ int main() {
 			death = j["TotalDeaths"];
 			recovered = j["TotalRecovered"];
 
+			//updateData(confirmedText, confirmed, font, textPos);
 			updateData(confirmed, font, textPos);
 			updateData(death, font, textPos, 60);
 			updateData(recovered, font, textPos, 120);
@@ -142,3 +144,8 @@ void updateData(int data, sf::Font font, sf::Vector2f pos, int shift) {
 	sf::Text dataText(str_, font);
 	dataText.setPosition(pos.x, pos.y + shift);
 }
+
+//void updateData(sf::Text& text, int data, sf::Font font, sf::Vector2f pos, int shift) {
+//	text = sf::Text(std::to_string(data), font);
+//	text.setPosition(pos.x, pos.y + shift);
+//}
