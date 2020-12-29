@@ -15,8 +15,9 @@ int main() {
 
 	int confirmed = j["TotalConfirmed"];
 	int death = j["TotalDeaths"];
+	int recovered = j["TotalRecovered"];
 
-	sf::RenderWindow w(sf::VideoMode(400, 160), L"COVID-19");
+	sf::RenderWindow w(sf::VideoMode(400, 200), L"COVID-19");
 
 	sf::Texture confirmedTexture;
 	if (!confirmedTexture.loadFromFile("confirmed.png")) {
@@ -28,11 +29,22 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
+	sf::Texture recoveredTexture;
+	if (!recoveredTexture.loadFromFile("recovered.png")) {
+		return EXIT_FAILURE;
+	}
+
+	sf::Vector2i spritePos(15, 20);
+	sf::Vector2i textPos(220, 20);
+
 	sf::Sprite confirmedSprite(confirmedTexture);
-	confirmedSprite.setPosition(15, 20);
+	confirmedSprite.setPosition(spritePos.x, spritePos.y);
 
 	sf::Sprite deathSprite(deathTexture);
-	deathSprite.setPosition(15, 80);
+	deathSprite.setPosition(spritePos.x, spritePos.y + 60);
+
+	sf::Sprite recoveredSprite(recoveredTexture);
+	recoveredSprite.setPosition(spritePos.x, spritePos.y + 120);
 
 	sf::Font font;
 	if (!font.loadFromFile("consola.ttf")) {
@@ -41,11 +53,15 @@ int main() {
 
 	sf::String confirmedString(std::to_string(confirmed));
 	sf::Text confirmedText(confirmedString, font);
-	confirmedText.setPosition(200, 20);
+	confirmedText.setPosition(textPos.x, textPos.y);
 
 	sf::String deathString(std::to_string(death));
 	sf::Text deathText(deathString, font);
-	deathText.setPosition(200, 80);
+	deathText.setPosition(textPos.x, textPos.y + 60);
+
+	sf::String recoveredString(std::to_string(recovered));
+	sf::Text recoveredText(recoveredString, font);
+	recoveredText.setPosition(textPos.x, textPos.y + 120);
 
 	while (w.isOpen()) {
 		w.setFramerateLimit(33);
@@ -57,10 +73,15 @@ int main() {
 		}
 
 		w.clear();
+
 		w.draw(confirmedSprite);
 		w.draw(deathSprite);
+		w.draw(recoveredSprite);
+
 		w.draw(confirmedText);
 		w.draw(deathText);
+		w.draw(recoveredText);
+
 		w.display();
 	}
 
