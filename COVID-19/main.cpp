@@ -48,6 +48,7 @@ int main() {
 	deathText.setPosition(200, 80);
 
 	while (w.isOpen()) {
+		w.setFramerateLimit(33);
 		sf::Event evt;
 		if (w.pollEvent(evt)) {
 			if (evt.type == sf::Event::Closed) {
