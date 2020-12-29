@@ -8,6 +8,9 @@
 
 using namespace std;
 
+string getCurrentTime();
+void updateData(int, sf::Font, sf::Vector2f, int shift=0);
+
 int main() {
 	httplib::SSLClient client("api.covid19api.com");
 	const string data = client.Get("/world/total")->body;
@@ -64,23 +67,19 @@ int main() {
 	sf::Text recoveredText(recoveredString, font);
 	recoveredText.setPosition(textPos.x, textPos.y + 120);
 
-	struct tm newtime;
-	time_t now = time(0);
-	localtime_s(&newtime, &now);
-	char buffer[80];
-     
+	string timeString = getCurrentTime();
+	
 	sf::Font fontDate;
 	if (!fontDate.loadFromFile("msjhbd.ttc")) {
 		return EXIT_FAILURE;
 	}
 
-	strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", &newtime);
-
 	sf::String updateDateString(L"上次更新於: ");
 
-	sf::Text updateDateText(updateDateString + buffer, fontDate, 20);
+	sf::Text updateDateText(updateDateString + timeString, fontDate, 20);
 	updateDateText.setPosition(spritePos.x, spritePos.y + 180);
 
+	sf::Clock clock;
 	while (w.isOpen()) {
 		w.setFramerateLimit(33);
 		sf::Event evt;
@@ -90,19 +89,56 @@ int main() {
 			}
 		}
 
+		if (clock.getElapsedTime().asSeconds() > 60.f) {
+			httplib::SSLClient client("api.covid19api.com");
+			const string data = client.Get("/world/total")->body;
+
+			nlohmann::json j = nlohmann::json::parse(data);
+
+			confirmed = j["TotalConfirmed"];
+			death = j["TotalDeaths"];
+			recovered = j["TotalRecovered"];
+
+			updateData(confirmed, font, textPos);
+			updateData(death, font, textPos, 60);
+			updateData(recovered, font, textPos, 120);
+
+			timeString = getCurrentTime();
+			updateDateText = sf::Text(updateDateString + timeString, fontDate, 20);
+			updateDateText.setPosition(spritePos.x, spritePos.y + 180);
+
+			clock.restart();
+		}
+
 		w.clear();
 
 		w.draw(confirmedSprite);
 		w.draw(deathSprite);
 		w.draw(recoveredSprite);
-		w.draw(updateDateText);
-
+		
 		w.draw(confirmedText);
 		w.draw(deathText);
 		w.draw(recoveredText);
+		w.draw(updateDateText);
 
 		w.display();
 	}
 
 	return EXIT_SUCCESS;
+}
+
+string getCurrentTime() {
+	struct tm newtime;
+	time_t now = time(0);
+	localtime_s(&newtime, &now);
+	char buffer[80];
+
+	strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", &newtime);
+	return buffer;
+}
+
+void updateData(int data, sf::Font font, sf::Vector2f pos, int shift) {
+	sf::String str_(std::to_string(data));
+	sf::Text dataText(str_, font);
+	dataText.setPosition(pos.x, pos.y + shift);
 }
