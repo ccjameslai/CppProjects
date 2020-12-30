@@ -9,19 +9,9 @@
 using namespace std;
 
 string getCurrentTime();
-void updateData(int, sf::Font, sf::Vector2f, int shift=0);
 //void updateData(sf::Text&, int, sf::Font, sf::Vector2f, int shift=0);
 
 int main() {
-	httplib::SSLClient client("api.covid19api.com");
-	const string data = client.Get("/world/total")->body;
-
-	nlohmann::json j = nlohmann::json::parse(data);
-
-	int confirmed = j["TotalConfirmed"];
-	int death = j["TotalDeaths"];
-	int recovered = j["TotalRecovered"];
-
 	sf::RenderWindow w(sf::VideoMode(400, 240), L"COVID-19");
 
 	sf::Texture confirmedTexture;
@@ -56,6 +46,15 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
+	httplib::SSLClient client("api.covid19api.com");
+	const string data = client.Get("/world/total")->body;
+
+	nlohmann::json j = nlohmann::json::parse(data);
+
+	int confirmed = j["TotalConfirmed"];
+	int death = j["TotalDeaths"];
+	int recovered = j["TotalRecovered"];
+
 	sf::String confirmedString(std::to_string(confirmed));
 	sf::Text confirmedText(confirmedString, font);
 	confirmedText.setPosition(textPos.x, textPos.y);
@@ -83,6 +82,12 @@ int main() {
 	sf::Clock clock;
 	const float updateTime = 60.0f;
 
+	enum class COUNTRY {
+		NONE,
+		TAIWAN,
+	};
+	COUNTRY country = COUNTRY::NONE;
+
 	while (w.isOpen()) {
 		w.setFramerateLimit(33);
 		sf::Event evt;
@@ -90,20 +95,76 @@ int main() {
 			if (evt.type == sf::Event::Closed) {
 				w.close();
 			}
+
+			if (evt.type == sf::Event::KeyPressed) {
+				if (evt.key.code == sf::Keyboard::T) {
+					country = COUNTRY::TAIWAN;
+
+					httplib::SSLClient client("api.covid19api.com");
+					const string data = client.Get("/total/country/Taiwan")->body;
+
+					nlohmann::json j = nlohmann::json::parse(data);
+					int indxOfLatestInfo = j.size() - 1;
+
+					confirmed = j[indxOfLatestInfo]["Confirmed"];
+					death = j[indxOfLatestInfo]["Deaths"];
+					recovered = j[indxOfLatestInfo]["Recovered"];
+					timeString = j[indxOfLatestInfo]["Date"];
+				}
+
+				if (evt.key.code == sf::Keyboard::W) {
+					country = COUNTRY::NONE;
+
+					httplib::SSLClient client("api.covid19api.com");
+					const string data = client.Get("/world/total")->body;
+
+					nlohmann::json j = nlohmann::json::parse(data);
+
+					confirmed = j["TotalConfirmed"];
+					death = j["TotalDeaths"];
+					recovered = j["TotalRecovered"];
+
+					timeString = getCurrentTime();
+				}
+			}
 		}
 
 		if (clock.getElapsedTime().asSeconds() > updateTime) {
-			httplib::SSLClient client("api.covid19api.com");
-			const string data = client.Get("/world/total")->body;
+			if (country == COUNTRY::NONE) {
+				httplib::SSLClient client("api.covid19api.com");
+				const string data = client.Get("/world/total")->body;
 
-			nlohmann::json j = nlohmann::json::parse(data);
+				nlohmann::json j = nlohmann::json::parse(data);
 
-			confirmed = j["TotalConfirmed"];
-			death = j["TotalDeaths"];
-			recovered = j["TotalRecovered"];
+				confirmed = j["TotalConfirmed"];
+				death = j["TotalDeaths"];
+				recovered = j["TotalRecovered"];
 
-			timeString = getCurrentTime();
+				timeString = getCurrentTime();
+			}
+			if (country == COUNTRY::TAIWAN) {
+				httplib::SSLClient client("api.covid19api.com");
+				const string data = client.Get("/total/country/Taiwan")->body;
 
+				nlohmann::json j = nlohmann::json::parse(data);
+				int indxOfLatestInfo = j.size() - 1;
+
+				confirmed = j[indxOfLatestInfo]["Confirmed"];
+				death = j[indxOfLatestInfo]["Deaths"];
+				recovered = j[indxOfLatestInfo]["Recovered"];
+				timeString = j[indxOfLatestInfo]["Date"];
+			}
+
+			clock.restart();
+		}
+
+		w.clear();
+
+		w.draw(confirmedSprite);
+		w.draw(deathSprite);
+		w.draw(recoveredSprite);
+		
+		if (country == COUNTRY::NONE) {
 			confirmedString = sf::String(std::to_string(confirmed));
 			confirmedText = sf::Text(confirmedString, font);
 			confirmedText.setPosition(textPos.x, textPos.y);
@@ -118,19 +179,29 @@ int main() {
 
 			updateDateText = sf::Text(updateDateString + timeString, fontDate, 20);
 			updateDateText.setPosition(spritePos.x, spritePos.y + 180);
+		} 
 
-			clock.restart();
+		if (country == COUNTRY::TAIWAN) {
+			confirmedString = sf::String(std::to_string(confirmed));
+			confirmedText = sf::Text(confirmedString, font);
+			confirmedText.setPosition(textPos.x, textPos.y);
+
+			deathString = sf::String(std::to_string(death));
+			deathText = sf::Text(deathString, font);
+			deathText.setPosition(textPos.x, textPos.y + 60);
+
+			recoveredString = sf::String(std::to_string(recovered));
+			recoveredText = sf::Text(recoveredString, font);
+			recoveredText.setPosition(textPos.x, textPos.y + 120);
+
+			updateDateText = sf::Text(updateDateString + timeString, fontDate, 20);
+			updateDateText.setPosition(spritePos.x, spritePos.y + 180);
 		}
 
-		w.clear();
-
-		w.draw(confirmedSprite);
-		w.draw(deathSprite);
-		w.draw(recoveredSprite);
-		
 		w.draw(confirmedText);
 		w.draw(deathText);
 		w.draw(recoveredText);
+
 		w.draw(updateDateText);
 
 		w.display();
