@@ -81,6 +81,8 @@ int main() {
 	updateDateText.setPosition(spritePos.x, spritePos.y + 180);
 
 	sf::Clock clock;
+	const float updateTime = 60.0f;
+
 	while (w.isOpen()) {
 		w.setFramerateLimit(33);
 		sf::Event evt;
@@ -90,7 +92,7 @@ int main() {
 			}
 		}
 
-		if (clock.getElapsedTime().asSeconds() > 10.f) {
+		if (clock.getElapsedTime().asSeconds() > updateTime) {
 			httplib::SSLClient client("api.covid19api.com");
 			const string data = client.Get("/world/total")->body;
 
@@ -100,12 +102,20 @@ int main() {
 			death = j["TotalDeaths"];
 			recovered = j["TotalRecovered"];
 
-			//updateData(confirmedText, confirmed, font, textPos);
-			updateData(confirmed, font, textPos);
-			updateData(death, font, textPos, 60);
-			updateData(recovered, font, textPos, 120);
-
 			timeString = getCurrentTime();
+
+			confirmedString = sf::String(std::to_string(confirmed));
+			confirmedText = sf::Text(confirmedString, font);
+			confirmedText.setPosition(textPos.x, textPos.y);
+
+			deathString = sf::String(std::to_string(death));
+			deathText = sf::Text(deathString, font);
+			deathText.setPosition(textPos.x, textPos.y + 60);
+
+			recoveredString = sf::String(std::to_string(recovered));
+			recoveredText = sf::Text(recoveredString, font);
+			recoveredText.setPosition(textPos.x, textPos.y + 120);
+
 			updateDateText = sf::Text(updateDateString + timeString, fontDate, 20);
 			updateDateText.setPosition(spritePos.x, spritePos.y + 180);
 
@@ -137,12 +147,6 @@ string getCurrentTime() {
 
 	strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", &newtime);
 	return buffer;
-}
-
-void updateData(int data, sf::Font font, sf::Vector2f pos, int shift) {
-	sf::String str_(std::to_string(data));
-	sf::Text dataText(str_, font);
-	dataText.setPosition(pos.x, pos.y + shift);
 }
 
 //void updateData(sf::Text& text, int data, sf::Font font, sf::Vector2f pos, int shift) {
