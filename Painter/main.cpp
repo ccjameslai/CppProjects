@@ -4,6 +4,11 @@
 using namespace std;
 
 int main() {
+	sf::Font font;
+	if (!font.loadFromFile("msjhbd.ttc")) {
+		return EXIT_FAILURE;
+	}
+
 	sf::RenderWindow w(sf::VideoMode(642, 640), L"小畫家");
 
 	sf::CircleShape cursor(10);
@@ -49,12 +54,20 @@ int main() {
 	sf::Vector2f canvasOffset(20, 60);
 	sf::Sprite canvasSprite(canvas.getTexture());
 	canvasSprite.setPosition(canvasOffset);
+	bool isSaved = false;
+
+	sf::Clock clock;
 
 	while (w.isOpen()) {
 		sf::Event evt;
 		if (w.pollEvent(evt)) {
 			if (evt.type == sf::Event::Closed) {
 				w.close();
+			}
+
+			if (evt.key.code == sf::Keyboard::S) {
+				canvas.getTexture().copyToImage().saveToFile("canvas.png");
+				isSaved = true;
 			}
 
 			if (evt.type == sf::Event::MouseButtonPressed) {
@@ -78,6 +91,7 @@ int main() {
 		}
 
 		w.clear(sf::Color::White);
+
 		w.draw(backgroundSprite);
 		w.draw(canvasSprite);
 
@@ -86,6 +100,28 @@ int main() {
 		}
 
 		cursor.setPosition(sf::Vector2f(mousePos));
+		
+		sf::Text msg;
+		if (isSaved) {
+			sf::Image image;
+			if (image.loadFromFile("canvas.png")) {
+				msg = sf::Text(sf::String(L"存檔成功"), font, 100);
+			}
+			else {
+				msg = sf::Text(sf::String(L"存檔失敗"), font, 100);
+			}
+
+			msg.setFillColor(sf::Color::Black);
+			msg.setPosition(sf::Vector2f(100, 200));
+			w.draw(msg);
+
+			if (clock.getElapsedTime().asSeconds() > 3.0f) {
+				isSaved = false;
+
+				clock.restart();
+			}
+		}
+
 		w.draw(cursor);
 		w.display();
 	}
