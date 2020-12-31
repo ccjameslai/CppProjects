@@ -12,17 +12,35 @@ int main() {
 	sf::RenderWindow w(sf::VideoMode(642, 640), L"¤pµe®a");
 
 	enum class CursorSize {
-		NORMAL = 10,
-		LARGE = 20,
-		SMALL = 5,
+		SMALL = 1,
+		NORMAL = 2,
+		LARGE = 4,
 	};
 
 	int cursorSize = int(CursorSize::NORMAL);
 
-	sf::CircleShape cursor(cursorSize);
-	cursor.setFillColor(sf::Color::Black);
-	cursor.setOrigin(10, 10);
+	sf::RectangleShape cursorR(sf::Vector2f(10, 10));
+	cursorR.setFillColor(sf::Color::Black);
+	cursorR.setOrigin(5, 5);
 
+	sf::CircleShape cursorC(5);
+	cursorC.setFillColor(sf::Color::Black);
+	cursorC.setOrigin(5, 5);
+
+	vector<sf::Shape*> cursors = {
+		&cursorC,
+		&cursorR,
+	};
+
+	enum class CursorType {
+		CIRCLE,
+		RECTANGLE,
+	};
+	
+	int cursorType = int(CursorType::CIRCLE);
+	
+	sf::Shape* cursor = cursors[cursorType];
+	
 	vector<sf::Color> colors = {
 		sf::Color::Black,
 		sf::Color::Red,
@@ -87,6 +105,16 @@ int main() {
 				if (evt.key.code == sf::Keyboard::Num3) {
 					cursorSize = int(CursorSize::LARGE);
 				}
+
+				if (evt.key.code == sf::Keyboard::R) {
+					cursorType = int(CursorType::RECTANGLE);
+					cursor = cursors[cursorType];
+				}
+
+				if (evt.key.code == sf::Keyboard::C) {
+					cursorType = int(CursorType::CIRCLE);
+					cursor = cursors[cursorType];
+				}
 			}
 
 			if (evt.type == sf::Event::MouseButtonPressed) {
@@ -94,7 +122,7 @@ int main() {
 					for (const auto& s : swatches) {
 						if (s.getGlobalBounds().
 							contains(sf::Vector2f(evt.mouseButton.x, evt.mouseButton.y))){
-							cursor.setFillColor(s.getFillColor());
+							cursor->setFillColor(s.getFillColor());
 						}
 					}
 				}
@@ -104,8 +132,8 @@ int main() {
 		sf::Vector2i mousePos = sf::Mouse::getPosition(w);
 
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-			cursor.setPosition(sf::Vector2f(mousePos) - canvasOffset);
-			canvas.draw(cursor);
+			cursor->setPosition(sf::Vector2f(mousePos) - canvasOffset);
+			canvas.draw(*cursor);
 			canvas.display();
 		}
 
@@ -118,7 +146,7 @@ int main() {
 			w.draw(s);
 		}
 
-		cursor.setPosition(sf::Vector2f(mousePos));
+		cursor->setPosition(sf::Vector2f(mousePos));
 		
 		sf::Text msg;
 		if (isSaved) {
@@ -141,9 +169,10 @@ int main() {
 			}
 			clock.restart();
 		}
-		
-		cursor.setRadius(cursorSize);
-		w.draw(cursor);
+
+		cursor->setScale(sf::Vector2f(cursorSize, cursorSize));
+
+		w.draw(*cursor);
 		w.display();
 	}
 
