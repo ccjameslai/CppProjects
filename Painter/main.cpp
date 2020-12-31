@@ -11,11 +11,18 @@ int main() {
 
 	sf::RenderWindow w(sf::VideoMode(642, 640), L"小畫家");
 
-	sf::CircleShape cursor(10);
+	enum class CursorSize {
+		NORMAL = 10,
+		LARGE = 20,
+		SMALL = 5,
+	};
+
+	int cursorSize = int(CursorSize::NORMAL);
+
+	sf::CircleShape cursor(cursorSize);
 	cursor.setFillColor(sf::Color::Black);
 	cursor.setOrigin(10, 10);
 
-	
 	vector<sf::Color> colors = {
 		sf::Color::Black,
 		sf::Color::Red,
@@ -56,8 +63,6 @@ int main() {
 	canvasSprite.setPosition(canvasOffset);
 	bool isSaved = false;
 
-	sf::Clock clock;
-
 	while (w.isOpen()) {
 		sf::Event evt;
 		if (w.pollEvent(evt)) {
@@ -65,9 +70,23 @@ int main() {
 				w.close();
 			}
 
-			if (evt.key.code == sf::Keyboard::S) {
-				canvas.getTexture().copyToImage().saveToFile("canvas.png");
-				isSaved = true;
+			if (evt.type == sf::Event::KeyPressed) {
+				if (evt.key.code == sf::Keyboard::S) {
+					canvas.getTexture().copyToImage().saveToFile("canvas.png");
+					isSaved = true;
+				}
+
+				if (evt.key.code == sf::Keyboard::Num1) {
+					cursorSize = int(CursorSize::SMALL);
+				}
+
+				if (evt.key.code == sf::Keyboard::Num2) {
+					cursorSize = int(CursorSize::NORMAL);
+				}
+
+				if (evt.key.code == sf::Keyboard::Num3) {
+					cursorSize = int(CursorSize::LARGE);
+				}
 			}
 
 			if (evt.type == sf::Event::MouseButtonPressed) {
@@ -103,6 +122,7 @@ int main() {
 		
 		sf::Text msg;
 		if (isSaved) {
+			sf::Clock clock;
 			sf::Image image;
 			if (image.loadFromFile("canvas.png")) {
 				msg = sf::Text(sf::String(L"存檔成功"), font, 100);
@@ -114,15 +134,18 @@ int main() {
 			msg.setFillColor(sf::Color::Black);
 			msg.setPosition(sf::Vector2f(100, 200));
 			w.draw(msg);
+			w.display();
 
-			if (clock.getElapsedTime().asSeconds() > 3.0f) {
+			while (clock.getElapsedTime().asSeconds() < 2.0f) {
 				isSaved = false;
-
-				clock.restart();
 			}
+			clock.restart();
 		}
-
+		
+		cursor.setRadius(cursorSize);
 		w.draw(cursor);
 		w.display();
 	}
+
+	return EXIT_SUCCESS;
 }
