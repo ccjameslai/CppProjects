@@ -120,20 +120,31 @@ int main() {
 					isDead = true;
 				}
 			}
-			
+
+			bool bonus = false;
 			if (!isDead) {
 				snake.insert(snake.begin(), head);
 
+				
 				if (head == food) {
 					count++;
 					s.setString(std::to_string(count));
 					
 					food.x = rand() % fieldSize.x;
 					food.y = rand() % fieldSize.y;
+
+					if (rand() % 100 <= 20) {
+						bonus = true;
+					}
 				}
 				else {
 					snake.pop_back();
 				}
+			}
+			
+			if (bonus) {
+				numOfLandmine++;
+				landminesPos.push_back(sf::Vector2f(rand() % fieldSize.x, rand() % fieldSize.y));
 			}
 
 			clock.restart();
@@ -152,6 +163,7 @@ int main() {
 				direction = DIRECTION(rand() % 4);
 
 				landminesPos.clear();
+				numOfLandmine = 4;
 				for (size_t i = 0; i < numOfLandmine; i++) {
 					landminesPos.push_back(sf::Vector2f(rand() % fieldSize.x, rand() % fieldSize.y));
 				};
@@ -179,6 +191,9 @@ int main() {
 
 		for (const auto& pos : landminesPos) {
 			landmineSprite.setPosition(pos.x * landmineSize.x, pos.y * landmineSize.y);
+			if (pos.x == food.x && pos.y == food.y) {
+				continue;
+			}
 			w.draw(landmineSprite);
 		}
 
