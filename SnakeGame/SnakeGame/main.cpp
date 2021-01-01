@@ -65,10 +65,12 @@ int main() {
 	
 	enum class DIRECTION {UP, DOWN, LEFT, RIGHT};
 	DIRECTION direction = DIRECTION::RIGHT;
-
+	
 	sf::Clock clock;
 	bool isDead = false;
 	int count = 0;
+	int genlandmineRate = 20;
+	float speed = 0.3f;
 
 	while (w.isOpen()) {
 		sf::Event evt;
@@ -93,7 +95,7 @@ int main() {
 			}
 		}
 
-		if (clock.getElapsedTime().asSeconds() >= 0.4f) {
+		if (clock.getElapsedTime().asSeconds() >= speed) {
 			sf::Vector2i head = snake[0];
 
 			if (direction == DIRECTION::RIGHT) {
@@ -133,7 +135,7 @@ int main() {
 					food.x = rand() % fieldSize.x;
 					food.y = rand() % fieldSize.y;
 
-					if (rand() % 100 <= 20) {
+					if (rand() % 100 <= genlandmineRate) {
 						bonus = true;
 					}
 				}
@@ -145,6 +147,7 @@ int main() {
 			if (bonus) {
 				numOfLandmine++;
 				landminesPos.push_back(sf::Vector2f(rand() % fieldSize.x, rand() % fieldSize.y));
+				speed = 0.1f;
 			}
 
 			clock.restart();
@@ -167,7 +170,7 @@ int main() {
 				for (size_t i = 0; i < numOfLandmine; i++) {
 					landminesPos.push_back(sf::Vector2f(rand() % fieldSize.x, rand() % fieldSize.y));
 				};
-
+				speed = 0.3f;
 				count = 0;
 				s.setString(std::to_string(count));
 			}
