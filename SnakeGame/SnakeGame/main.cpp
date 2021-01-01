@@ -4,6 +4,10 @@
 #include <vector>
 #include <string>
 
+using namespace std;
+
+bool IsLandmine(sf::Vector2i, vector<sf::Vector2f>);
+
 int main() {
 	sf::Texture texture;
 	
@@ -27,11 +31,28 @@ int main() {
 	sf::Sprite foodblock(texture);
 	foodblock.setColor(sf::Color(50, 200, 50));
 
+	sf::Texture landmineTexture;
+	if (!landmineTexture.loadFromFile("landmine.PNG")) {
+		return EXIT_FAILURE;
+	}
+	sf::Sprite landmineSprite(landmineTexture);
+
+	sf::Vector2f landmineSize(
+		landmineSprite.getGlobalBounds().width,
+		landmineSprite.getGlobalBounds().height);
+
+	int numOfLandmine = 4;
+	std::vector<sf::Vector2f> landminesPos{};
+	for (size_t i = 0; i < numOfLandmine; i++) {
+		landminesPos.push_back(sf::Vector2f(rand() % fieldSize.x, rand() % fieldSize.y));
+	};
+	
 	sf::Vector2<float> blockSize(
 		block.getGlobalBounds().width, 
 		block.getGlobalBounds().height);
 
-	sf::Vector2i food(rand()% fieldSize.x, rand() % fieldSize.y);
+	sf::Vector2i food(rand() % fieldSize.x, rand() % fieldSize.y);
+
 	std::vector<sf::Vector2i> snake = { sf::Vector2i(3, 4) };
 
 	srand(unsigned int(time(NULL)));
@@ -89,7 +110,8 @@ int main() {
 			}
 
 			if (head.x < 0 || head.x >= fieldSize.x ||
-				head.y < 0 || head.y >= fieldSize.y) {
+				head.y < 0 || head.y >= fieldSize.y ||
+				IsLandmine(head, landminesPos)) {
 				isDead = true;
 			}
 
@@ -129,6 +151,11 @@ int main() {
 
 				direction = DIRECTION(rand() % 4);
 
+				landminesPos.clear();
+				for (size_t i = 0; i < numOfLandmine; i++) {
+					landminesPos.push_back(sf::Vector2f(rand() % fieldSize.x, rand() % fieldSize.y));
+				};
+
 				count = 0;
 				s.setString(std::to_string(count));
 			}
@@ -150,8 +177,24 @@ int main() {
 		foodblock.setPosition(foodPos);
 		w.draw(foodblock);
 
+		for (const auto& pos : landminesPos) {
+			landmineSprite.setPosition(pos.x * landmineSize.x, pos.y * landmineSize.y);
+			w.draw(landmineSprite);
+		}
+
 		w.display();
 		
 	}
 	return EXIT_SUCCESS;
+}
+
+bool IsLandmine(sf::Vector2i headPos, vector<sf::Vector2f> landminsPos) {
+	bool result = false;
+	for (const auto& pos : landminsPos) {
+		if (headPos.x == pos.x && headPos.y == pos.y) {
+			result = true;
+			break;
+		}
+	}
+	return result;
 }
